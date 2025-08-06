@@ -43,12 +43,46 @@ const Navbar = () => {
     navigate(`/profile/${user.id}`);
   };
 
+
+  const handlemobileprofile = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    navigate(`/profile/${user.id}`);
+    setOpen(false);
+  }
+
+  const handleArticle =() =>{
+    navigate("/create-article");
+    setOpen(false);
+  }
+
+  const handleArticleMobile = () => {
+    navigate("/create-article");
+    setOpen(false);
+  }
+
+  const handleDraftArticle = () => {
+    navigate("/draft-article");
+    setOpen(false);
+  }
+
   const handlehome = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
     if(!isLoggedIn) {
       navigate("/");
       return;
     }
-    navigate(`${user?.role === "admin" ? "/admin-home" : "/"}`);
+    if(user?.role === "admin") {
+      navigate("/admin-home");
+      return;
+    }
+    else if(user?.role === "user") {
+      navigate("/");
+      return;
+    }
+    else{
+      navigate("/");
+      return;
+    }
   };
 
 
@@ -57,7 +91,6 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="text-white text-2xl md:text-3xl font-semibold cursor-pointer" onClick={handlehome}>
           Article Posting
-
         </div>
         
         <div className="md:hidden">
@@ -92,8 +125,14 @@ const Navbar = () => {
           </button>
         </div>
         <div className="hidden md:flex space-x-6 items-center">
+          <div className="text-white hover:text-gray-300 cursor-pointer mr-4 sm:mr-4" onClick={handleArticle}>
+                Add Article
+              </div>
+
+          
           {isLoggedIn ? (
-            <div className="relative" ref={dropdownRef}>
+            <div className="relative " ref={dropdownRef}>
+              
               <button
                 className="text-white hover:text-gray-300"
                 onClick={() => setOpenDropdown(!openDropdown)}
@@ -103,7 +142,7 @@ const Navbar = () => {
               {openDropdown && (
                 <div className="absolute right-0 mt-2 w-40 bg-white rounded shadow-lg z-50 cursor-pointer">
                   <div className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={handleProfile}>Profile</div>
-                  <div className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={handleProfile}>Draft Articles</div>
+                  <div className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={handleDraftArticle}>Draft Articles</div>
                   <div className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={handleLogout}>Logout</div>
                 </div>
               )}
@@ -120,19 +159,20 @@ const Navbar = () => {
         <div className="md:hidden mt-2 flex flex-col space-y-2">
           {isLoggedIn ? (
             <>
+
+             <div className="text-white hover:text-gray-300" onClick={handleArticleMobile}>
+              Add Article
+            </div>
+            <div className="text-white hover:text-gray-300" onClick={handlemobileprofile}>
+              Profile
+            </div>
+             
               <Link
-                to="/profile"
+                to="/draft-article"
                 className="text-white hover:text-gray-300"
                 onClick={() => setOpen(false)}
               >
-                Profile
-              </Link>
-              <Link
-                to="/blog"
-                className="text-white hover:text-gray-300"
-                onClick={() => setOpen(false)}
-              >
-                Blog
+                Draft Articles
               </Link>
               <button
                 onClick={() => {

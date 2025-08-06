@@ -9,6 +9,8 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Forgot_password from "./pages/forgot-password/Forgot_password";
 import Reset_password from "./pages/forgot-password/Reset_password";
+import CreateArticle from "./pages/articles/CreateArticle";
+import DraftArticle from "./pages/articles/DraftArticle";
 function App() {
   return (
     <Router>
@@ -24,6 +26,8 @@ function App() {
             <Route path="/profile/:id" element={<Profile />} />
             <Route path="/forgot-password" element={<Forgot_password />} />
 <Route path="/reset-password" element={<Reset_password />} />
+            <Route path="/create-article" element={<CreateArticle />} />
+            <Route path="/draft-article" element={<DraftArticle />} />
           </Routes>
         </div>
         <Footer />
