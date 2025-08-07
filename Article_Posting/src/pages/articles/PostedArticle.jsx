@@ -12,7 +12,7 @@ const PostedArticle = () => {
       .get("http://localhost:8080/api/articles/all")
       .then((res) => {
         setArticles(
-          res.data.articles.filter((article) => article.type === "draft" && article.user === user.id)
+          res.data.articles.filter((article) => article.type === "published")
         );
         setLoading(false);
       })
@@ -21,14 +21,12 @@ const PostedArticle = () => {
 
   return (
     <div className="p-6 sm:pl-36 sm:pr-24 min-h-screen bg-gray-50">
-      <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
-        Draft Articles
-      </h2>
+      
 
       {loading ? (
         <p className="text-center text-lg text-gray-500">Loading Articles...</p>
       ) : articles.length === 0 ? (
-        <p className="text-center text-lg text-red-500">No draft articles found.</p>
+        <p className="text-center text-lg text-red-500">No published articles found.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ">
           {articles.map((article) => (

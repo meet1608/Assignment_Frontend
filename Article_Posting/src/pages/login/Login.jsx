@@ -30,7 +30,7 @@ const Login = () => {
           localStorage.setItem("user", JSON.stringify(data.user));
 
           const redirectPath =
-            data.user?.role === "admin" ? "/admin-home" : "/";
+            data.user?.role === "admin" ? "/admin/articles" : "/";
 
           setTimeout(() => {
             navigate(redirectPath);

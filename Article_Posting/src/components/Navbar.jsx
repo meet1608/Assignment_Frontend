@@ -72,7 +72,7 @@ const Navbar = () => {
       return;
     }
     if(user?.role === "admin") {
-      navigate("/admin-home");
+      navigate("/admin/articles");
       return;
     }
     else if(user?.role === "user") {
@@ -141,9 +141,36 @@ const Navbar = () => {
               </button>
               {openDropdown && (
                 <div className="absolute right-0 mt-2 w-40 bg-white rounded shadow-lg z-50 cursor-pointer">
-                  <div className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={handleProfile}>Profile</div>
-                  <div className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={handleDraftArticle}>Draft Articles</div>
-                  <div className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={handleLogout}>Logout</div>
+                  <div
+                    className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    onClick={() => {
+                      handleProfile();
+                      setOpenDropdown(false); // Close dropdown
+                    }}
+                  >
+                    Profile
+                  </div>
+
+<div
+  className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100"
+  onClick={() => {
+    handleDraftArticle();
+    setOpenDropdown(false); // Close dropdown
+  }}
+>
+  Draft Articles
+</div>
+
+<div
+  className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100"
+  onClick={() => {
+    handleLogout();
+    setOpenDropdown(false); // Close dropdown
+  }}
+>
+  Logout
+</div>
+
                 </div>
               )}
             </div>

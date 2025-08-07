@@ -5,6 +5,8 @@ const CreateArticle = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [form, setForm] = useState({
     userId: user.id,
+    autherProfileImage: user.profileImage,
+    autherName: user.firstName + " " + user.lastName,
     title: "",
     content: "",
     type:"",
@@ -27,6 +29,8 @@ const CreateArticle = () => {
 
     const formData = new FormData();
     formData.append("userId", form.userId);
+    formData.append("autherProfileImage", form.autherProfileImage);
+    formData.append("autherName", form.autherName);
     formData.append("title", form.title);
     formData.append("type", articleType);
     formData.append("content", form.content);
@@ -39,7 +43,7 @@ const CreateArticle = () => {
         { headers: { "Content-Type": "multipart/form-data" } }
       );
       setMessage(res.data.message || "Article submitted!");
-      setForm({ userId: form.userId, title: "", content: "" });
+      setForm({ userId: form.userId, title: "", content: "",autherName: form.autherName, autherProfileImage: form.autherProfileImage });
       setFile(null);
     } catch (err) {
       setMessage(

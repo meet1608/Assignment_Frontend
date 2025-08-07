@@ -1,60 +1,42 @@
-import React, { useEffect, useState } from "react";
-import Navbar from "../../components/Navbar";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import Sidebar from '../../components/AdminSideBar';
+import Card from '../../components/Card';
+import axios from 'axios';
 
 const Admin_home = () => {
-  const [users, setUsers] = useState([]);
+  const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
     axios
-      .get("http://localhost:8080/api/users/all")
+      .get("http://localhost:8080/api/articles/all")
       .then((res) => {
-        setUsers(res.data);
+        setArticles(
+          res.data.articles.filter((article) => article.type === "published")
+        );
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
 
   return (
-    <div>
-      <h1>Welcome To Admin Home</h1>
-      {loading ? (
-        <p>Loading users...</p>
-      ) : (
-        <table className="min-w-full mt-4 border">
-          <thead>
-            <tr>
-              <th className="border px-4 py-2">Profile Picture</th>
-              <th className="border px-4 py-2">First Name</th>
-              <th className="border px-4 py-2">Last Name</th>
-              <th className="border px-4 py-2">Email</th>
-              <th className="border px-4 py-2">Role</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user._id}>
-                <td className="border px-4 py-2">
-                  <img
-                    src={
-                      user.profileImage
-                        ? `http://localhost:8080${user.profileImage}`
-                        : "/default-profile.png"
-                    }
-                    alt="Profile"
-                    className="w-10 h-10 rounded-full"
-                  />
-                </td>
-                <td className="border px-4 py-2 ">{user.firstName}</td>
-                <td className="border px-4 py-2 ">{user.lastName}</td>
-                <td className="border px-4 py-2 ">{user.email}</td>
-                <td className="border px-4 py-2 ">{user.role}</td>
-              </tr>
+    <div className="flex min-h-screen bg-gray-50">
+      <Sidebar />
+
+      <div className="flex-1 p-6 sm:pr-24 overflow-y-auto">
+        {loading ? (
+          <p className="text-center text-lg text-gray-500">Loading Articles...</p>
+        ) : articles.length === 0 ? (
+          <p className="text-center text-lg text-red-500">No published articles found.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {articles.map((article) => (
+              <Card key={article._id || article.id} article={article} />
             ))}
-          </tbody>
-        </table>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
