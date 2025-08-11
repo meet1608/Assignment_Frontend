@@ -10,7 +10,10 @@ const Admin_home = () => {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     axios
-      .get("http://localhost:8080/api/articles/all")
+      .get("http://localhost:8080/api/articles/all",{
+        headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+      }})
       .then((res) => {
         setArticles(
           res.data.articles.filter((article) => article.type === "published")

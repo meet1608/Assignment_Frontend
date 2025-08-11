@@ -7,9 +7,13 @@ const PostedArticle = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token");
     axios
-      .get("http://localhost:8080/api/articles/all")
+       .get("http://localhost:8080/api/articles/all", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
       .then((res) => {
         setArticles(
           res.data.articles.filter((article) => article.type === "published")

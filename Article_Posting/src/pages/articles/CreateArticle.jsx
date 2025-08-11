@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
-
+import Layout from "../../components/Layout";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 const CreateArticle = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [form, setForm] = useState({
     userId: user.id,
-    autherProfileImage: user.profileImage,
-    autherName: user.firstName + " " + user.lastName,
     title: "",
     content: "",
     type:"",
@@ -14,7 +15,7 @@ const CreateArticle = () => {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
+  const navigate = useNavigate();
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -29,8 +30,6 @@ const CreateArticle = () => {
 
     const formData = new FormData();
     formData.append("userId", form.userId);
-    formData.append("autherProfileImage", form.autherProfileImage);
-    formData.append("autherName", form.autherName);
     formData.append("title", form.title);
     formData.append("type", articleType);
     formData.append("content", form.content);
@@ -40,20 +39,32 @@ const CreateArticle = () => {
       const res = await axios.post(
         "http://localhost:8080/api/articles/create",
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        { headers: { "Content-Type": "multipart/form-data",
+         Authorization: `Bearer ${localStorage.getItem("token")}`,
+
+         } }
       );
+             
       setMessage(res.data.message || "Article submitted!");
-      setForm({ userId: form.userId, title: "", content: "",autherName: form.autherName, autherProfileImage: form.autherProfileImage });
+      setForm({ userId: form.userId, title: "", content: "", type: "" , articleImage: "" });
       setFile(null);
+      toast.success(res.data.message || "Article submitted!");
+      setTimeout(() => {
+        navigate("/");
+      },2000)
     } catch (err) {
       setMessage(
         err.response?.data?.message || "Error uploading article"
       );
+      toast.error(err.response?.data?.message || "Error uploading article");
     }
     setSubmitting(false);
   };
 
   return (
+    <Layout>
+            <ToastContainer position="top-center" />
+      
     <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md mt-12">
       <h2 className="text-2xl font-bold text-center mb-6 text-black">Create Article</h2>
       <form className="flex flex-col gap-4">
@@ -113,12 +124,13 @@ const CreateArticle = () => {
           {submitting ? "Submitting..." : "Post Article"}
         </button>
       </form>
-      {message &&
+      {/* {message &&
         <div className="mt-6 text-center p-3 rounded-lg bg-gray-400 text-black font-medium">
           {message}
         </div>
-      }
+      } */}
     </div>
+    </Layout>
   );
 };
 

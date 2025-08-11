@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Card from "../../components/Card"; 
-
+import Layout from "../../components/Layout";
 const PostedArticle = () => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,10 +9,13 @@ const PostedArticle = () => {
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     axios
-      .get("http://localhost:8080/api/articles/all")
+      .get("http://localhost:8080/api/articles/all",{
+        headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      }})
       .then((res) => {
         setArticles(
-          res.data.articles.filter((article) => article.type === "draft" && article.user === user.id)
+          res.data.articles.filter((article) => article.type === "draft" && article.user._id === user.id)
         );
         setLoading(false);
       })
@@ -20,6 +23,7 @@ const PostedArticle = () => {
   }, []);
 
   return (
+    <Layout>
     <div className="p-6 sm:pl-36 sm:pr-24 min-h-screen bg-gray-50">
       <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
         Draft Articles
@@ -37,6 +41,7 @@ const PostedArticle = () => {
         </div>
       )}
     </div>
+    </Layout>
   );
 };
 

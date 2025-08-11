@@ -15,7 +15,11 @@ const EditArticle = () => {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    axios.get(`http://localhost:8080/api/articles/${id}`).then((res) => {
+    axios.get(`http://localhost:8080/api/articles/${id}`,{
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }).then((res) => {
       setArticle(res.data.article);
     });
   }, [id]);
@@ -44,6 +48,7 @@ const EditArticle = () => {
       await axios.put(`http://localhost:8080/api/articles/update/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       navigate("/");

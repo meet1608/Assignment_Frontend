@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { CiUser } from "react-icons/ci";
 
 const Navbar = () => {
@@ -8,17 +8,18 @@ const Navbar = () => {
   const [openDropdown, setOpenDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const isActive = (path) =>
+    location.pathname === path ? "bg-sky-700 text-gray-100" : "hover:bg-yellow-300  hover:text-gray-100";
   useEffect(() => {
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (token && user) {
-    setIsLoggedIn(true);
-  } else {
-    setIsLoggedIn(false);
-  }
-}, [localStorage.getItem("token"), localStorage.getItem("user")]);
-
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (token && user) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, [localStorage.getItem("token"), localStorage.getItem("user")]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -35,6 +36,7 @@ const Navbar = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setIsLoggedIn(false);
+    window.location.reload();
     navigate("/");
   };
 
@@ -43,56 +45,55 @@ const Navbar = () => {
     navigate(`/profile/${user.id}`);
   };
 
-
   const handlemobileprofile = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     navigate(`/profile/${user.id}`);
     setOpen(false);
-  }
+  };
 
-  const handleArticle =() =>{
+  const handleArticle = () => {
     navigate("/create-article");
     setOpen(false);
-  }
+  };
 
   const handleArticleMobile = () => {
     navigate("/create-article");
     setOpen(false);
-  }
+  };
 
   const handleDraftArticle = () => {
     navigate("/draft-article");
     setOpen(false);
-  }
+  };
 
   const handlehome = () => {
     const user = JSON.parse(localStorage.getItem("user"));
-    if(!isLoggedIn) {
+    if (!isLoggedIn) {
       navigate("/");
       return;
     }
-    if(user?.role === "admin") {
+    if (user?.role === "admin") {
       navigate("/admin/articles");
       return;
-    }
-    else if(user?.role === "user") {
+    } else if (user?.role === "user") {
       navigate("/");
       return;
-    }
-    else{
+    } else {
       navigate("/");
       return;
     }
   };
 
-
   return (
     <nav className="bg-black p-4 fixed w-full z-10">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <div className="text-white text-2xl md:text-3xl font-semibold cursor-pointer" onClick={handlehome}>
+        <div
+          className="text-white text-2xl md:text-3xl font-semibold cursor-pointer"
+          onClick={handlehome}
+        >
           Article Posting
         </div>
-        
+
         <div className="md:hidden">
           <button
             onClick={() => setOpen(!open)}
@@ -125,14 +126,25 @@ const Navbar = () => {
           </button>
         </div>
         <div className="hidden md:flex space-x-6 items-center">
-          <div className="text-white hover:text-gray-300 cursor-pointer mr-4 sm:mr-4" onClick={handleArticle}>
-                Add Article
-              </div>
+          <div className="flex items-center bg-gray-800 rounded px-2 py-1 text-white hover:text-gray-300 cursor-pointer mr-4 sm:mr-4">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="bg-transparent outline-none text-white placeholder-gray-400 w-full"
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button onClick={handleArticle}>🔍</button>
+          </div>
 
-          
+          <div
+            className={`${isActive("/create-article")} flex items-center bg-gray-800 rounded px-2 py-1 text-white hover:text-gray-300 cursor-pointer mr-4 sm:mr-4 `}
+            onClick={handleArticle}
+          >
+            Add Article
+          </div>
+
           {isLoggedIn ? (
             <div className="relative " ref={dropdownRef}>
-              
               <button
                 className="text-white hover:text-gray-300"
                 onClick={() => setOpenDropdown(!openDropdown)}
@@ -151,26 +163,25 @@ const Navbar = () => {
                     Profile
                   </div>
 
-<div
-  className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100"
-  onClick={() => {
-    handleDraftArticle();
-    setOpenDropdown(false); // Close dropdown
-  }}
->
-  Draft Articles
-</div>
+                  <div
+                    className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    onClick={() => {
+                      handleDraftArticle();
+                      setOpenDropdown(false); // Close dropdown
+                    }}
+                  >
+                    Draft Articles
+                  </div>
 
-<div
-  className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100"
-  onClick={() => {
-    handleLogout();
-    setOpenDropdown(false); // Close dropdown
-  }}
->
-  Logout
-</div>
-
+                  <div
+                    className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    onClick={() => {
+                      handleLogout();
+                      setOpenDropdown(false); // Close dropdown
+                    }}
+                  >
+                    Logout
+                  </div>
                 </div>
               )}
             </div>
@@ -186,14 +197,19 @@ const Navbar = () => {
         <div className="md:hidden mt-2 flex flex-col space-y-2">
           {isLoggedIn ? (
             <>
+              <div
+                className="text-white hover:text-gray-300"
+                onClick={handleArticleMobile}
+              >
+                Add Article
+              </div>
+              <div
+                className="text-white hover:text-gray-300"
+                onClick={handlemobileprofile}
+              >
+                Profile
+              </div>
 
-             <div className="text-white hover:text-gray-300" onClick={handleArticleMobile}>
-              Add Article
-            </div>
-            <div className="text-white hover:text-gray-300" onClick={handlemobileprofile}>
-              Profile
-            </div>
-             
               <Link
                 to="/draft-article"
                 className="text-white hover:text-gray-300"
