@@ -5,11 +5,12 @@ import Layout from "../../components/Layout";
 const PostedArticle = () => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     axios
-      .get("http://localhost:8080/api/articles/all",{
+      .get(`${frontendUrl}/api/articles/all`,{
         headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       }})

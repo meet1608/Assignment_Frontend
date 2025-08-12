@@ -7,6 +7,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
   const navigate = useNavigate();
   const handlesubmit = (e) => {
@@ -16,7 +17,7 @@ const Login = () => {
       email,
       password,
     };
-    fetch("http://localhost:8080/api/users/login", {
+    fetch(`${frontendUrl}/api/users/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),

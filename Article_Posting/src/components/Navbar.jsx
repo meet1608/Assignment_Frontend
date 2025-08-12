@@ -10,7 +10,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isActive = (path) =>
-    location.pathname === path ? "bg-sky-700 text-gray-100" : "hover:bg-yellow-300  hover:text-gray-100";
+    location.pathname === path ? "bg-yellow-300 " : "hover:bg-yellow-300  hover:text-black";
   useEffect(() => {
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user"));
@@ -126,18 +126,10 @@ const Navbar = () => {
           </button>
         </div>
         <div className="hidden md:flex space-x-6 items-center">
-          <div className="flex items-center bg-gray-800 rounded px-2 py-1 text-white hover:text-gray-300 cursor-pointer mr-4 sm:mr-4">
-            <input
-              type="text"
-              placeholder="Search..."
-              className="bg-transparent outline-none text-white placeholder-gray-400 w-full"
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button onClick={handleArticle}>🔍</button>
-          </div>
+          
 
           <div
-            className={`${isActive("/create-article")} flex items-center bg-gray-800 rounded px-2 py-1 text-white hover:text-gray-300 cursor-pointer mr-4 sm:mr-4 `}
+            className={`${isActive("/create-article")} flex items-center bg-gray-800 rounded px-2 py-1 text-white  cursor-pointer mr-4 sm:mr-4 `}
             onClick={handleArticle}
           >
             Add Article

@@ -23,6 +23,7 @@ import EditArticle from "./pages/articles/EditArticle";
 import AdminAllUsers from "./pages/admin-home/AdminAllUsers";
 import EmpNavbar from "./components/EmptyNavbar";
 import Articles from "./pages/articles/Articles";
+import Edit_User from "./pages/admin-home/Edit_User";
 
 function Layout() {
   const location = useLocation();
@@ -38,7 +39,7 @@ function Layout() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {isNoNavbarRoute ? /*<EmpNavbar />*/ "" : <Navbar />}
+      {isNoNavbarRoute ? <EmpNavbar />  : <Navbar />}
       <div className="flex-grow mt-16">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -113,9 +114,17 @@ function Layout() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/edit-user/:id"
+            element={
+              <ProtectedRoute>
+                <Edit_User />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </div>
-      {isNoNavbarRoute ? /*<EmpNavbar />*/ "" : <Footer />}
+      {isNoNavbarRoute ? <Footer /> : <Footer />}
     </div>
   );
 }

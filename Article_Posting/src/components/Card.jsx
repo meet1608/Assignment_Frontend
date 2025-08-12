@@ -14,6 +14,7 @@ const formatDate = (iso) => new Date(iso).toLocaleDateString();
 export default function ImgMediaCard({ article }) {
   const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
+const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
   const handleEdit = () => navigate(`/edit-article/${article._id}`);
 
@@ -28,7 +29,7 @@ export default function ImgMediaCard({ article }) {
             <button
               onClick={async () => {
                 try {
-                  await fetch(`http://localhost:8080/api/articles/delete/${articleId}`, {
+                  await fetch(`${frontendUrl}/api/articles/delete/${articleId}`, {
                     method: "DELETE",
                     headers: {
                       Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -87,7 +88,7 @@ export default function ImgMediaCard({ article }) {
       >
         <CardMedia
           component="img"
-          image={`http://localhost:8080${article.articleImage}`}
+          image={`${frontendUrl}${article.articleImage}`}
           alt={article.title}
           sx={{
             height: 340, 
@@ -102,17 +103,22 @@ export default function ImgMediaCard({ article }) {
           display: "flex", alignItems: "center", marginBottom: "1em"
         }}>
           <Avatar
-            src={`http://localhost:8080${article.user.profileImage}`}
+            src={`${frontendUrl}${article.user.profileImage}`}
             alt={article.user.firstName}
             sx={{ width: 32, height: 32, bgcolor: "#3b82f6", marginRight: 1 }}
           />
           <Typography variant="subtitle2">
             {article.user.firstName} {article.user.lastName}
           </Typography>
+          
         </div>
-        <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
+         <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
           {formatDate(article.createdAt)}
         </Typography>
+        <Typography variant="subtitle2">
+            {article.user.email}
+          </Typography>
+       
         <Typography
           variant="h6"
           sx={{ fontWeight: 700, mt: 1, mb: 1.5 }}

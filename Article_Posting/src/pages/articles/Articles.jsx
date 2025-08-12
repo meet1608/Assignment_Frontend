@@ -6,11 +6,12 @@ const Articles = () => {
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const res = await fetch(`http://localhost:8080/api/articles/${id}`, {
+        const res = await fetch(`${frontendUrl}/api/articles/${id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -84,7 +85,7 @@ const Articles = () => {
         }}
       >
         <img
-          src={`http://localhost:8080${article.user.profileImage}`}
+          src={`${frontendUrl}${article.user.profileImage}`}
           alt={`${article.user.firstName} ${article.user.lastName}`}
           style={{
             width: 60,
@@ -111,7 +112,7 @@ const Articles = () => {
 
       {article.articleImage && (
         <img
-          src={`http://localhost:8080${article.articleImage}`}
+          src={`${frontendUrl}${article.articleImage}`}
           alt={article.title}
           style={{
             width: "100%",

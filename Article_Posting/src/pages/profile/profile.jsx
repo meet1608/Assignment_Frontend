@@ -18,11 +18,12 @@ const Profile = () => {
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const navigate = useNavigate();
+const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user && user.id) {
-      fetch(`http://localhost:8080/api/users/get/${user.id}`, {
+      fetch(`${frontendUrl}/api/users/get/${user.id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -93,7 +94,7 @@ const handleChange = (e) => {
     if (selectedFile) {
       formData.append("profileImage", selectedFile);
     }
-    fetch(`http://localhost:8080/api/users/update/${user.id}`, {
+    fetch(`${frontendUrl}/api/users/update/${user.id}`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
@@ -142,7 +143,7 @@ const handleChange = (e) => {
               <img
                 src={
                   profile.profileImage
-                    ? `http://localhost:8080${profile.profileImage}`
+                    ? `${frontendUrl}${profile.profileImage}`
                     : "/default-profile.png"
                 }
                 alt="Profile"
@@ -256,7 +257,7 @@ const handleChange = (e) => {
                         src={
                           selectedFile
                             ? form.profileImage
-                            : `http://localhost:8080${form.profileImage}`
+                            : `${frontendUrl}${form.profileImage}`
                         }
                         alt="Preview"
                         className="w-16 h-16 rounded-full mt-3 border border-gray-200 object-cover"

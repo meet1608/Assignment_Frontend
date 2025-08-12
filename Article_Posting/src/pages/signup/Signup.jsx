@@ -8,6 +8,7 @@ const Signup = () => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -18,7 +19,7 @@ const Signup = () => {
       email,
     };
 
-    fetch("http://localhost:8080/api/users/create", {
+    fetch(`${frontendUrl}/api/users/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),

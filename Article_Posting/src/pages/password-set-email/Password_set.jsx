@@ -10,13 +10,14 @@ const Password_set = () => {
   const token = new URLSearchParams(location.search).get("token");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const res = await axios.post(
-        `http://localhost:8080/api/users/set-password/${token}`,
+        `${frontendUrl}/api/users/set-password/${token}`,
         { password }
       );
       toast.success(res.data.message || "Password set successfully");

@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 const CreateArticle = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [form, setForm] = useState({
-    userId: user.id,
     title: "",
     content: "",
     type:"",
@@ -19,6 +18,7 @@ const CreateArticle = () => {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -29,7 +29,6 @@ const CreateArticle = () => {
     setSubmitting(true);
 
     const formData = new FormData();
-    formData.append("userId", form.userId);
     formData.append("title", form.title);
     formData.append("type", articleType);
     formData.append("content", form.content);
@@ -37,7 +36,7 @@ const CreateArticle = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:8080/api/articles/create",
+        `${frontendUrl}/api/articles/create`,
         formData,
         { headers: { "Content-Type": "multipart/form-data",
          Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -46,7 +45,7 @@ const CreateArticle = () => {
       );
              
       setMessage(res.data.message || "Article submitted!");
-      setForm({ userId: form.userId, title: "", content: "", type: "" , articleImage: "" });
+      setForm({ title: "", content: "", type: "" , articleImage: "" });
       setFile(null);
       toast.success(res.data.message || "Article submitted!");
       setTimeout(() => {

@@ -11,6 +11,7 @@ const Reset_password = () => {
   const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,7 +23,7 @@ const Reset_password = () => {
     }
     try {
       const res = await axios.post(
-        `http://localhost:8080/api/users/reset-password/${token}`,
+        `${frontendUrl}/api/users/reset-password/${token}`,
         { password, confirmPassword }
       );
       toast.success(res.data.message || "Password reset successfully");

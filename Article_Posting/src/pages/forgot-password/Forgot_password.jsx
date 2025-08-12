@@ -5,13 +5,14 @@ import "react-toastify/dist/ReactToastify.css";
 const Forgot_password = () => {
       const [loading, setLoading] = useState(false);
       const [email, setEmail] = useState("");
+const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
     const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:8080/api/users/forgot-password",
+        `${frontendUrl}/api/users/forgot-password`,
         { email }
       );
       toast.success(res.data.message || "Password reset link sent to your email");
