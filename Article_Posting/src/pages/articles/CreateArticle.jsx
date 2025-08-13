@@ -23,42 +23,45 @@ const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
+const handleSubmit = async (e, articleType) => {
+  e.preventDefault();
+  setSubmitting(true);
 
-  const handleSubmit = async (e, articleType) => {
-    e.preventDefault();
-    setSubmitting(true);
+  const formData = new FormData();
+  formData.append("title", form.title);
+  formData.append("type", articleType);
+  formData.append("content", form.content);
+  if (file) formData.append("articleImage", file);
 
-    const formData = new FormData();
-    formData.append("title", form.title);
-    formData.append("type", articleType);
-    formData.append("content", form.content);
-    if (file) formData.append("articleImage", file);
+  try {
+    const res = await axios.post(
+      `${frontendUrl}/api/articles/create`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
 
-    try {
-      const res = await axios.post(
-        `${frontendUrl}/api/articles/create`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data",
-         Authorization: `Bearer ${localStorage.getItem("token")}`,
-
-         } }
-      );
-             
-      setMessage(res.data.message || "Article submitted!");
-      setForm({ title: "", content: "", type: "" , articleImage: "" });
-      setFile(null);
-      toast.success(res.data.message || "Article submitted!");
-      setTimeout(() => {
-        navigate("/");
-      },2000)
-    } catch (err) {
-      setMessage(
-        err.response?.data?.message || "Error uploading article"
-      );
-      toast.error(err.response?.data?.message || "Error uploading article");
-    }
+    setMessage(res.data.message || "Article submitted!");
+    setForm({ title: "", content: "", type: "", articleImage: "" });
+    setFile(null);
+    toast.success(res.data.message || "Article submitted!");
+    setTimeout(() => {
+      navigate("/");
+    }, 2000);
+  } catch (err) {
+    const errorMsg = err.response?.data?.message || "Error uploading article";
+    setMessage(errorMsg);
+    toast.error(errorMsg);
+  } finally {
     setSubmitting(false);
-  };
+  }
+};
+
+
 
   return (
     <Layout>

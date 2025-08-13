@@ -1,40 +1,48 @@
-import React, { useState } from 'react'
+import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+// Yup schema with password confirmation check
+const schema = yup.object().shape({
+  password: yup.string().required("New Password is required").min(6, "Minimum 6 characters"),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password"), null], "Passwords must match")
+    .required("Confirm Password is required"),
+});
 
 const Reset_password = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const token = new URLSearchParams(location.search).get("token");
-  const [loading, setLoading] = useState(false);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
+  const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      setLoading(false);
-      return;
-    }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const onSubmit = async (data) => {
     try {
-      const res = await axios.post(
-        `${frontendUrl}/api/users/reset-password/${token}`,
-        { password, confirmPassword }
-      );
+      const res = await axios.post(`${frontendUrl}/api/users/reset-password/${token}`, {
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+      });
       toast.success(res.data.message || "Password reset successfully");
       setTimeout(() => {
         navigate("/login");
       }, 3000);
     } catch (err) {
-      console.error(err);
       toast.error(err.response?.data?.message || "Failed to reset password");
-    } finally {
-      setLoading(false);
+      console.error("Reset Password Error:", err);
     }
   };
 
@@ -42,41 +50,67 @@ const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
     <div>
       <ToastContainer position="top-center" />
       <h1 className="text-3xl font-bold text-center mt-8">Reset Password</h1>
-      <form className="max-w-md mx-auto mt-8" onSubmit={handleSubmit}>
+      <form
+        className="max-w-md mx-auto mt-8"
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+      >
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+          <label
+            htmlFor="password"
+            className="block text-gray-700 text-sm font-bold mb-2"
+          >
             New Password
           </label>
           <input
-            className="w-full p-2 border border-gray-300 rounded"
-            type="password"
             id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            type="password"
+            {...register("password")}
+            className={`w-full p-2 border rounded ${
+              errors.password ? "border-red-500" : "border-gray-300"
+            }`}
+            aria-invalid={errors.password ? "true" : "false"}
           />
+          {errors.password && (
+            <p className="text-red-500 text-xs italic" role="alert">
+              {errors.password.message}
+            </p>
+          )}
         </div>
+
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirm-password">
+          <label
+            htmlFor="confirmPassword"
+            className="block text-gray-700 text-sm font-bold mb-2"
+          >
             Confirm Password
           </label>
           <input
-            className="w-full p-2 border border-gray-300 rounded"
+            id="confirmPassword"
             type="password"
-            id="confirm-password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            {...register("confirmPassword")}
+            className={`w-full p-2 border rounded ${
+              errors.confirmPassword ? "border-red-500" : "border-gray-300"
+            }`}
+            aria-invalid={errors.confirmPassword ? "true" : "false"}
           />
+          {errors.confirmPassword && (
+            <p className="text-red-500 text-xs italic" role="alert">
+              {errors.confirmPassword.message}
+            </p>
+          )}
         </div>
+
         <button
-          disabled={loading}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="submit"
+          disabled={isSubmitting}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
         >
-          {loading ? "Resetting..." : "Reset Password"}
+          {isSubmitting ? "Resetting..." : "Reset Password"}
         </button>
       </form>
     </div>
-  )
-}
+  );
+};
 
 export default Reset_password;

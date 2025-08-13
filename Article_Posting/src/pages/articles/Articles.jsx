@@ -8,25 +8,26 @@ const Articles = () => {
   const [error, setError] = useState(null);
 const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
+const fetchArticle = async () => {
+  setLoading(true);
+  try {
+    const res = await axios.get(`${frontendUrl}/api/articles/${id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    setArticle(res.data.article);
+  } catch (err) {
+    setError(err.response?.data?.message || err.message || "Failed to fetch article");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
+
   useEffect(() => {
-    const fetchArticle = async () => {
-      try {
-        const res = await fetch(`${frontendUrl}/api/articles/${id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        if (!res.ok) throw new Error("Failed to fetch article");
-        const data = await res.json();
-        setArticle(data.article);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchArticle();
   }, [id]);
 

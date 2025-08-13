@@ -1,34 +1,46 @@
-import React, { useState } from "react";
+import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+// Yup schema for password validation
+const schema = yup.object().shape({
+  password: yup
+    .string()
+    .required("Password is required")
+    .min(6, "Password must be at least 6 characters"),
+});
 
 const Password_set = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const token = new URLSearchParams(location.search).get("token");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
+  const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const onSubmit = async (data) => {
     try {
-      const res = await axios.post(
-        `${frontendUrl}/api/users/set-password/${token}`,
-        { password }
-      );
+      const res = await axios.post(`${frontendUrl}/api/users/set-password/${token}`, {
+        password: data.password,
+      });
       toast.success(res.data.message || "Password set successfully");
       setTimeout(() => {
         navigate("/login");
-      }, 3000); 
+      }, 3000);
     } catch (err) {
-      console.error(err);
       toast.error(err.response?.data?.message || "Failed to set password");
-    } finally {
-      setLoading(false);
+      console.error("Error setting password:", err);
     }
   };
 
@@ -36,31 +48,38 @@ const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
     <div>
       <ToastContainer position="top-center" />
       <h1 className="text-3xl font-bold text-center mt-8">Set Password</h1>
-      <form className="max-w-md mx-auto mt-8" onSubmit={handleSubmit}>
+      <form className="max-w-md mx-auto mt-8" onSubmit={handleSubmit(onSubmit)} noValidate>
         <div className="mb-4">
           <label
-            className="block text-gray-700 text-sm font-bold mb-2"
             htmlFor="password"
+            className="block text-gray-700 text-sm font-bold mb-2"
           >
             Password
           </label>
           <input
-            type="password"
             id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            type="password"
+            {...register("password")}
+            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+              errors.password ? "border-red-500" : ""
+            }`}
             placeholder="Enter your password"
-            required
+            aria-invalid={errors.password ? "true" : "false"}
           />
+          {errors.password && (
+            <p className="text-red-500 text-xs italic" role="alert">
+              {errors.password.message}
+            </p>
+          )}
         </div>
+
         <div className="flex items-center justify-between">
           <button
             type="submit"
-            disabled={loading}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            disabled={isSubmitting}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
           >
-            {loading ? "Submitting..." : "Submit"}
+            {isSubmitting ? "Submitting..." : "Submit"}
           </button>
         </div>
       </form>

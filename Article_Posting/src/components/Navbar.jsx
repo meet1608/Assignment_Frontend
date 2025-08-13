@@ -128,12 +128,12 @@ const Navbar = () => {
         <div className="hidden md:flex space-x-6 items-center">
           
 
-          <div
+          {/* <div
             className={`${isActive("/create-article")} flex items-center bg-gray-800 rounded px-2 py-1 text-white  cursor-pointer mr-4 sm:mr-4 `}
             onClick={handleArticle}
           >
             Add Article
-          </div>
+          </div> */}
 
           {isLoggedIn ? (
             <div className="relative " ref={dropdownRef}>

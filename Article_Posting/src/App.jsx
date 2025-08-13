@@ -7,8 +7,8 @@ import {
 import ProtectedRoute from "./protectedRoutes/protectedRoutes";
 
 import Home from "./pages/home/Home";
-import Signup from "./pages/signup/signup";
-import Login from "./pages/login/login";
+import Signup from "./pages/signup/Signup";
+import Login from "./pages/login/Login";
 import Admin_home from "./pages/admin-home/Admin_home";
 import Password_set from "./pages/password-set-email/Password_set";
 import Profile from "./pages/profile/profile";
@@ -24,32 +24,28 @@ import AdminAllUsers from "./pages/admin-home/AdminAllUsers";
 import EmpNavbar from "./components/EmptyNavbar";
 import Articles from "./pages/articles/Articles";
 import Edit_User from "./pages/admin-home/Edit_User";
+import LayoutWithNavbar from './components/navbarComponents/LayoutWithNavbar';
+import LayoutWithoutNavbar from './components/navbarComponents/LayoutWithoutNavbar';
 
-function Layout() {
-  const location = useLocation();
-
-  const noNavbarRoutes = [
-    "/login",
-    "/signup",
-    "/forgot-password",
-    "/reset-password",
-    "/set-password",
-  ];
-  const isNoNavbarRoute = noNavbarRoutes.includes(location.pathname);
-
+function App() {
   return (
-    <div className="flex flex-col min-h-screen">
-      {isNoNavbarRoute ? <EmpNavbar />  : <Navbar />}
-      <div className="flex-grow mt-16">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/signup" element={<Signup />} />
+    <Router>
+      <Routes>
+
+        {/* Routes without navbar */}
+        <Route element={<LayoutWithoutNavbar />}>
           <Route path="/login" element={<Login />} />
-          <Route path="/set-password" element={<Password_set />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<Forgot_password />} />
           <Route path="/reset-password" element={<Reset_password />} />
+          <Route path="/set-password" element={<Password_set />} />
+        </Route>
 
-          {/* Protected Routes */}
+        {/* Routes with navbar */}
+        <Route element={<LayoutWithNavbar />}>
+          <Route path="/" element={<Home />} />
+
+          {/* Protected routes inside layout with navbar */}
           <Route
             path="/admin/articles"
             element={
@@ -122,17 +118,8 @@ function Layout() {
               </ProtectedRoute>
             }
           />
-        </Routes>
-      </div>
-      {isNoNavbarRoute ? <Footer /> : <Footer />}
-    </div>
-  );
-}
-
-function App() {
-  return (
-    <Router>
-      <Layout />
+        </Route>
+      </Routes>
     </Router>
   );
 }
