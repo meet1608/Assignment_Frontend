@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../../components/TokenExpires";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Layout from "../../components/Layout";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import profile from "../../assets/images/profile.avif";
 const Edit_User = () => {
   const { id } = useParams();
   const { state } = useLocation();
@@ -96,7 +96,7 @@ const Edit_User = () => {
     toast.success("User updated successfully");
     setTimeout(() => {
       navigate("/admin/users");
-    }, 2000);
+    }, 500);
   } catch (error) {
     console.error("Error updating user:", error.response?.data || error);
     toast.error("Failed to update user");
@@ -194,7 +194,7 @@ const Edit_User = () => {
               formData.profileImage &&
               !(formData.profileImage instanceof File) && (
                 <img
-                  src={`${frontendUrl}${formData.profileImage}`}
+                  src={`${frontendUrl}${formData.profileImage}`|| profile}
                   alt="Current Image"
                   className="w-32 h-32 object-cover rounded-full"
                 />

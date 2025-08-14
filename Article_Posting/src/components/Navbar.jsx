@@ -9,8 +9,13 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const user = JSON.parse(localStorage.getItem("user"));
+  const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
+
   const isActive = (path) =>
-    location.pathname === path ? "bg-yellow-300 " : "hover:bg-yellow-300  hover:text-black";
+    location.pathname === path
+      ? "bg-yellow-300 "
+      : "hover:bg-yellow-300  hover:text-black";
   useEffect(() => {
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user"));
@@ -126,22 +131,28 @@ const Navbar = () => {
           </button>
         </div>
         <div className="hidden md:flex space-x-6 items-center">
-          
-
-          {/* <div
-            className={`${isActive("/create-article")} flex items-center bg-gray-800 rounded px-2 py-1 text-white  cursor-pointer mr-4 sm:mr-4 `}
-            onClick={handleArticle}
-          >
-            Add Article
-          </div> */}
+       
 
           {isLoggedIn ? (
             <div className="relative " ref={dropdownRef}>
               <button
-                className="text-white hover:text-gray-300"
+                className="flex items-center gap-2 focus:outline-none"
                 onClick={() => setOpenDropdown(!openDropdown)}
               >
-                <CiUser className="w-7 h-7 " />
+                <img
+                  src={
+                    user?.profileImage
+                      ? `${frontendUrl}${user.profileImage}`
+                      : "/default-profile.png"
+                  }
+                  alt="Profile"
+                  className="w-7 h-7 rounded-full object-cover"
+                />
+                {/* Username */}
+                <span className="text-white font-medium">
+                  {user?.firstName}{" "}
+                  {user?.lastName}
+                </span>
               </button>
               {openDropdown && (
                 <div className="absolute right-0 mt-2 w-40 bg-white rounded shadow-lg z-50 cursor-pointer">

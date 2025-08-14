@@ -6,8 +6,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { IoMdArrowBack } from "react-icons/io";
 import Layout from "../../components/Layout";
-import axios from "axios";
-
+import axios from "../../components/TokenExpires";
+import profile1 from "../../assets/images/profile.avif";
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -164,7 +164,7 @@ const fetchProfileDetails = async () => {
                   src={
                     profile.profileImage
                       ? `${frontendUrl}${profile.profileImage}`
-                      : "/default-profile.png"
+                      : profile1
                   }
                   alt="Profile"
                   className="w-32 h-32 object-cover rounded-full border-4 border-blue-200 shadow"

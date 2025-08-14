@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Layout from "../../components/Layout";
+import profile from "../../assets/images/profile.avif";
+import axios from "../../components/TokenExpires";
 const Articles = () => {
   const { id } = useParams();
   const [article, setArticle] = useState(null);
@@ -86,7 +88,7 @@ const fetchArticle = async () => {
         }}
       >
         <img
-          src={`${frontendUrl}${article.user.profileImage}`}
+          src={`${frontendUrl}${article.user.profileImage}`|| profile}
           alt={`${article.user.firstName} ${article.user.lastName}`}
           style={{
             width: 60,

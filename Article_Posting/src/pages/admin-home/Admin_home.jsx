@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/AdminSideBar";
 import Card from "../../components/Card";
-import axios from "axios";
-
+import axios from "../../components/TokenExpires";
+import { useNavigate } from "react-router-dom";
 const Admin_home = () => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState(""); 
-    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
-  
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+  const navigate = useNavigate();
     
 
   const handleArticle = () => {
@@ -34,9 +34,9 @@ const Admin_home = () => {
   try {
     const res = await axios.get(`${frontendUrl}/api/articles/all`, {
       headers: { Authorization: `Bearer ${token}` },
-      params: { search, all },
+      params: { search, all ,type:"published"},
     });
-    setArticles(res.data.articles.filter((a) => a.type === "published"));
+    setArticles(res.data.articles);
   } catch (error) {
     console.error("Failed to fetch articles:", error);
   } finally {

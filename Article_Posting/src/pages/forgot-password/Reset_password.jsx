@@ -1,15 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../../components/TokenExpires";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FaEye } from "react-icons/fa";
+import { GoEyeClosed } from "react-icons/go";
 
-// Yup schema with password confirmation check
 const schema = yup.object().shape({
-  password: yup.string().required("New Password is required").min(6, "Minimum 6 characters"),
+  password: yup
+    .string()
+    .required("New Password is required")
+    .min(6, "Minimum 6 characters"),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref("password"), null], "Passwords must match")
@@ -21,6 +25,8 @@ const Reset_password = () => {
   const navigate = useNavigate();
   const token = new URLSearchParams(location.search).get("token");
   const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -32,10 +38,13 @@ const Reset_password = () => {
 
   const onSubmit = async (data) => {
     try {
-      const res = await axios.post(`${frontendUrl}/api/users/reset-password/${token}`, {
-        password: data.password,
-        confirmPassword: data.confirmPassword,
-      });
+      const res = await axios.post(
+        `${frontendUrl}/api/users/reset-password/${token}`,
+        {
+          password: data.password,
+          confirmPassword: data.confirmPassword,
+        }
+      );
       toast.success(res.data.message || "Password reset successfully");
       setTimeout(() => {
         navigate("/login");
@@ -55,6 +64,7 @@ const Reset_password = () => {
         onSubmit={handleSubmit(onSubmit)}
         noValidate
       >
+        {/* Password field */}
         <div className="mb-4">
           <label
             htmlFor="password"
@@ -62,15 +72,24 @@ const Reset_password = () => {
           >
             New Password
           </label>
-          <input
-            id="password"
-            type="password"
-            {...register("password")}
-            className={`w-full p-2 border rounded ${
-              errors.password ? "border-red-500" : "border-gray-300"
-            }`}
-            aria-invalid={errors.password ? "true" : "false"}
-          />
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              {...register("password")}
+              className={`w-full p-2 border rounded ${
+                errors.password ? "border-red-500" : "border-gray-300"
+              }`}
+              aria-invalid={errors.password ? "true" : "false"}
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <GoEyeClosed /> : <FaEye />}
+            </button>
+          </div>
           {errors.password && (
             <p className="text-red-500 text-xs italic" role="alert">
               {errors.password.message}
@@ -78,6 +97,7 @@ const Reset_password = () => {
           )}
         </div>
 
+        {/* Confirm Password field */}
         <div className="mb-4">
           <label
             htmlFor="confirmPassword"
@@ -85,15 +105,24 @@ const Reset_password = () => {
           >
             Confirm Password
           </label>
-          <input
-            id="confirmPassword"
-            type="password"
-            {...register("confirmPassword")}
-            className={`w-full p-2 border rounded ${
-              errors.confirmPassword ? "border-red-500" : "border-gray-300"
-            }`}
-            aria-invalid={errors.confirmPassword ? "true" : "false"}
-          />
+          <div className="relative">
+            <input
+              id="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              {...register("confirmPassword")}
+              className={`w-full p-2 border rounded ${
+                errors.confirmPassword ? "border-red-500" : "border-gray-300"
+              }`}
+              aria-invalid={errors.confirmPassword ? "true" : "false"}
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              {showConfirmPassword ? <GoEyeClosed /> : <FaEye />}
+            </button>
+          </div>
           {errors.confirmPassword && (
             <p className="text-red-500 text-xs italic" role="alert">
               {errors.confirmPassword.message}

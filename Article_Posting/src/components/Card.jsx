@@ -8,7 +8,7 @@ import { MdDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import profile from "../assets/images/profile.avif"
 const formatDate = (iso) => new Date(iso).toLocaleDateString();
 
 export default function ImgMediaCard({ article }) {
@@ -104,7 +104,7 @@ const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
       >
         <CardMedia
           component="img"
-          image={`${frontendUrl}${article.articleImage}`}
+          image={`${frontendUrl}${article.articleImage}`|| profile}
           alt={article.title}
           sx={{
             height: 340, 
@@ -119,7 +119,7 @@ const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
           display: "flex", alignItems: "center", marginBottom: "1em"
         }}>
           <Avatar
-            src={`${frontendUrl}${article.user.profileImage}`}
+            src={`${frontendUrl}${article.user.profileImage}`|| profile}
             alt={article.user.firstName}
             sx={{ width: 32, height: 32, bgcolor: "#3b82f6", marginRight: 1 }}
           />

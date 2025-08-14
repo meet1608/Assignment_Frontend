@@ -1,137 +1,126 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axios from "../../components/TokenExpires";
 import Layout from "../../components/Layout";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-const CreateArticle = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  const [form, setForm] = useState({
-    title: "",
-    content: "",
-    type:"",
-  });
-  const [file, setFile] = useState(null);
-  const [message, setMessage] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const navigate = useNavigate();
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
 const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
-const handleSubmit = async (e, articleType) => {
-  e.preventDefault();
-  setSubmitting(true);
+const schema = yup.object().shape({
+  title: yup.string().required("Title is required"),
+  content: yup.string().required("Content is required"),
+  articleImage: yup
+  .mixed()
+  .test("fileSize", "File size is too large", (value) => {
+    if (!value || value.length === 0) return true; 
+    return value[0].size <= 5 * 1024 * 1024; 
+  })
 
-  const formData = new FormData();
-  formData.append("title", form.title);
-  formData.append("type", articleType);
-  formData.append("content", form.content);
-  if (file) formData.append("articleImage", file);
+});
 
-  try {
-    const res = await axios.post(
-      `${frontendUrl}/api/articles/create`,
-      formData,
-      {
+const CreateArticle = () => {
+  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const onSubmit = async (data, articleType) => {
+    setSubmitting(true);
+
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("content", data.content);
+    formData.append("type", articleType);
+    if (data.articleImage?.[0]) formData.append("articleImage", data.articleImage[0]);
+
+    try {
+      const res = await axios.post(`${frontendUrl}/api/articles/create`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-      }
-    );
-
-    setMessage(res.data.message || "Article submitted!");
-    setForm({ title: "", content: "", type: "", articleImage: "" });
-    setFile(null);
-    toast.success(res.data.message || "Article submitted!");
-    setTimeout(() => {
-      navigate("/");
-    }, 2000);
-  } catch (err) {
-    const errorMsg = err.response?.data?.message || "Error uploading article";
-    setMessage(errorMsg);
-    toast.error(errorMsg);
-  } finally {
-    setSubmitting(false);
-  }
-};
-
-
+      });
+      toast.success(res.data.message || "Article submitted!");
+      reset();
+      setTimeout(() => navigate("/"), 2000);
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || "Error uploading article";
+      toast.error(errorMsg);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <Layout>
-            <ToastContainer position="top-center" />
-      
-    <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md mt-12">
-      <h2 className="text-2xl font-bold text-center mb-6 text-black">Create Article</h2>
-      <form className="flex flex-col gap-4">
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium mb-1 text-gray-700">Title</label>
-          <input
-            type="text"
-            name="title"
-            id="title"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-            placeholder="Enter article title"
-            value={form.title}
-            onChange={handleChange}
-            required
-            autoComplete="off"
-          />
-        </div>
-        <div>
-          <label htmlFor="content" className="block text-sm font-medium mb-1 text-gray-700">Content</label>
-          <textarea
-            name="content"
-            id="content"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black min-h-[80px]"
-            placeholder="Write your article here..."
-            value={form.content}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="image" className="block text-sm font-medium mb-1 text-gray-700">Article Image</label>
-          <input
-            type="file"
-            name="articleImage"
-            id="image"
-            accept="image/*"
-            className="block w-full text-sm border border-gray-300 rounded-lg cursor-pointer py-2"
-            onChange={handleFileChange}
-          />
-        </div>
-        <button
-        onClick={(e) => handleSubmit(e, "draft")}
-          type="submit"
-          className={`mt-2 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold hover:bg-black transition ${submitting ? "opacity-50 cursor-not-allowed" : ""}`}
-          disabled={submitting}
-        >
-          {submitting ? "Submitting..." : "Draft Article"}
-        </button>
+      <ToastContainer position="top-center" />
+      <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md mt-12">
+        <h2 className="text-2xl font-bold text-center mb-6 text-black">Create Article</h2>
+        <form className="flex flex-col gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">Title</label>
+            <input
+              type="text"
+              {...register("title")}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              placeholder="Enter article title"
+              autoComplete="off"
+            />
+            {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
+          </div>
 
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">Content</label>
+            <textarea
+              {...register("content")}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black min-h-[80px]"
+              placeholder="Write your article here..."
+            />
+            {errors.content && <p className="text-red-500 text-sm">{errors.content.message}</p>}
+          </div>
 
+          <div>
+            <label className="block text-sm font-medium mb-1 text-gray-700">Article Image</label>
+            <input
+              type="file"
+              {...register("articleImage")}
+              accept="image/*"
+              className="block w-full text-sm border border-gray-300 rounded-lg cursor-pointer py-2"
+            />
+            {errors.articleImage && <p className="text-red-500 text-sm">{errors.articleImage.message}</p>}
+          </div>
 
-        <button
-        onClick={(e) => handleSubmit(e, "published")}
-          className={`mt-2 py-2 rounded-lg bg-black text-white font-semibold hover:bg-black transition ${submitting ? "opacity-50 cursor-not-allowed" : ""}`}
-          disabled={submitting}
-        >
-          {submitting ? "Submitting..." : "Post Article"}
-        </button>
-      </form>
-      {/* {message &&
-        <div className="mt-6 text-center p-3 rounded-lg bg-gray-400 text-black font-medium">
-          {message}
-        </div>
-      } */}
-    </div>
+          <button
+            type="button"
+            onClick={handleSubmit((data) => onSubmit(data, "draft"))}
+            className={`mt-2 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold hover:bg-black transition ${submitting ? "opacity-50 cursor-not-allowed" : ""}`}
+            disabled={submitting}
+          >
+            {submitting ? "Submitting..." : "Draft Article"}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSubmit((data) => onSubmit(data, "published"))}
+            className={`mt-2 py-2 rounded-lg bg-black text-white font-semibold hover:bg-black transition ${submitting ? "opacity-50 cursor-not-allowed" : ""}`}
+            disabled={submitting}
+          >
+            {submitting ? "Submitting..." : "Post Article"}
+          </button>
+        </form>
+      </div>
     </Layout>
   );
 };

@@ -1,13 +1,14 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../../components/TokenExpires";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FaEye } from "react-icons/fa";
+import { GoEyeClosed } from "react-icons/go";
 
-// Yup schema for password validation
 const schema = yup.object().shape({
   password: yup
     .string()
@@ -20,6 +21,7 @@ const Password_set = () => {
   const navigate = useNavigate();
   const token = new URLSearchParams(location.search).get("token");
   const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -31,9 +33,12 @@ const Password_set = () => {
 
   const onSubmit = async (data) => {
     try {
-      const res = await axios.post(`${frontendUrl}/api/users/set-password/${token}`, {
-        password: data.password,
-      });
+      const res = await axios.post(
+        `${frontendUrl}/api/users/set-password/${token}`,
+        {
+          password: data.password,
+        }
+      );
       toast.success(res.data.message || "Password set successfully");
       setTimeout(() => {
         navigate("/login");
@@ -48,7 +53,11 @@ const Password_set = () => {
     <div>
       <ToastContainer position="top-center" />
       <h1 className="text-3xl font-bold text-center mt-8">Set Password</h1>
-      <form className="max-w-md mx-auto mt-8" onSubmit={handleSubmit(onSubmit)} noValidate>
+      <form
+        className="max-w-md mx-auto mt-8"
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+      >
         <div className="mb-4">
           <label
             htmlFor="password"
@@ -56,16 +65,29 @@ const Password_set = () => {
           >
             Password
           </label>
-          <input
-            id="password"
-            type="password"
-            {...register("password")}
-            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
-              errors.password ? "border-red-500" : ""
-            }`}
-            placeholder="Enter your password"
-            aria-invalid={errors.password ? "true" : "false"}
-          />
+          {/* Wrap the password input + button together */}
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              {...register("password")}
+              className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                errors.password ? "border-red-500" : ""
+              }`}
+              placeholder="Enter your password"
+              aria-invalid={errors.password ? "true" : "false"}
+            />
+
+            {/* Eye toggle button inside input */}
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <GoEyeClosed /> : <FaEye />}
+            </button>
+          </div>
+
           {errors.password && (
             <p className="text-red-500 text-xs italic" role="alert">
               {errors.password.message}

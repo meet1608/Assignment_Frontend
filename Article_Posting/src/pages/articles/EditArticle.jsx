@@ -1,9 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../../components/TokenExpires";
 import Layout from "../../components/Layout";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
+
+const schema = yup.object().shape({
+  title: yup.string().required("Title is required"),
+  content: yup.string().required("Content is required"),
+  articleImage: yup
+    .mixed()
+    .test("fileSize", "File size is too large", (value) => {
+      if (!value || value.length === 0) return true; 
+      return value[0].size <= 5 * 1024 * 1024; 
+    })
+});
 
 const EditArticle = () => {
   const { id } = useParams();
@@ -16,18 +32,28 @@ const EditArticle = () => {
   });
   const [newImage, setNewImage] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
   const user = JSON.parse(localStorage.getItem("user"));
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
   const fetchArticle = async () => {
     try {
       const res = await axios.get(`${frontendUrl}/api/articles/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      if (res.data?.article) setArticle(res.data.article);
-      else throw new Error("Article data not found");
+      if (res.data?.article) {
+        setArticle(res.data.article);
+        setValue("title", res.data.article.title);
+        setValue("content", res.data.article.content);
+        
+      } else throw new Error("Article data not found");
     } catch (error) {
       console.error("Failed to fetch article for edit:", error);
       toast.error("Failed to load article data");
@@ -38,30 +64,12 @@ const EditArticle = () => {
     fetchArticle();
   }, [id]);
 
-  const handleChange = (e) => {
-    setArticle({ ...article, [e.target.name]: e.target.value });
-  };
-
-  const handleImageChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setNewImage(e.target.files[0]);
-    }
-  };
-
-  const handleSubmit = async (e, articleType) => {
-    e.preventDefault();
+  const onSubmit = async (data, articleType) => {
     setSubmitting(true);
-
-    if (!article.title.trim() || !article.content.trim()) {
-      toast.error("Title and content cannot be empty");
-      setSubmitting(false);
-      return;
-    }
-
     try {
       const formData = new FormData();
-      formData.append("title", article.title);
-      formData.append("content", article.content);
+      formData.append("title", data.title);
+      formData.append("content", data.content);
       formData.append("type", articleType);
       if (newImage) formData.append("articleImage", newImage);
 
@@ -88,24 +96,24 @@ const EditArticle = () => {
       <ToastContainer position="top-center" />
       <div className="p-6 max-w-xl mx-auto">
         <h2 className="text-2xl font-bold mb-4">Edit Article</h2>
-        <form encType="multipart/form-data" onSubmit={(e) => e.preventDefault()}>
+        <form onSubmit={(e) => e.preventDefault()}>
           <input
             type="text"
-            name="title"
-            value={article.title}
-            onChange={handleChange}
+            {...register("title")}
             placeholder="Title"
-            className="border p-2 w-full mb-4"
+            className="border p-2 w-full mb-1"
             disabled={submitting}
           />
+          {errors.title && <p className="text-red-500 text-sm mb-2">{errors.title.message}</p>}
+
           <textarea
-            name="content"
-            value={article.content}
-            onChange={handleChange}
+            {...register("content")}
             placeholder="Content"
-            className="border p-2 w-full mb-4 h-40"
+            className="border p-2 w-full mb-1 h-40"
             disabled={submitting}
           />
+          {errors.content && <p className="text-red-500 text-sm mb-2">{errors.content.message}</p>}
+
           <label className="block mb-2">Current Image:</label>
           {article.articleImage && (
             <img
@@ -114,15 +122,12 @@ const EditArticle = () => {
               className="h-40 object-cover mb-4"
             />
           )}
-          <input
-            type="file"
-            name="articleImage"
-            onChange={handleImageChange}
-            disabled={submitting}
-          />
+          <input type="file" onChange={(e) => setNewImage(e.target.files[0])} disabled={submitting} />
+
           <div className="flex gap-4 justify-end mt-4">
             <button
-              onClick={(e) => handleSubmit(e, "draft")}
+              type="button"
+              onClick={handleSubmit((data) => onSubmit(data, "draft"))}
               className={`py-2 px-4 rounded-lg bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold hover:bg-black transition ${
                 submitting ? "opacity-50 cursor-not-allowed" : ""
               }`}
@@ -130,8 +135,10 @@ const EditArticle = () => {
             >
               {submitting ? "Submitting..." : "Draft Article"}
             </button>
+
             <button
-              onClick={(e) => handleSubmit(e, "published")}
+              type="button"
+              onClick={handleSubmit((data) => onSubmit(data, "published"))}
               className={`py-2 px-4 rounded-lg bg-black text-white font-semibold hover:bg-black transition ${
                 submitting ? "opacity-50 cursor-not-allowed" : ""
               }`}

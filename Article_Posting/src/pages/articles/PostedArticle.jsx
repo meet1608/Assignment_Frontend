@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../../components/TokenExpires";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Card from "../../components/Card";
 
@@ -32,9 +32,9 @@ useEffect(() => {
   try {
     const res = await axios.get(`${frontendUrl}/api/articles/all`, {
       headers: { Authorization: `Bearer ${token}` },
-      params: { search, all },
+      params: { search, all,type:"published" },
     });
-    setArticles(res.data.articles.filter((article) => article.type === "published"));
+    setArticles(res.data.articles);
   } catch (error) {
     console.error("Error fetching articles:", error);
     toast.error("Failed to fetch articles");
