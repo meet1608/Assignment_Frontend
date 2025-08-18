@@ -121,6 +121,7 @@ const fetchProfileDetails = async () => {
     setProfile(data.user);
     setShowModal(false);
     toast.success("Profile updated successfully");
+    window.location.reload();
   } catch (err) {
     console.error("Error updating profile:", err);
     toast.error(err.response?.data?.message || "Failed to update profile");

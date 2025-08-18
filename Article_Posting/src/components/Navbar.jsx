@@ -26,7 +26,6 @@ const Navbar = () => {
     }
   }, [localStorage.getItem("token"), localStorage.getItem("user")]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -41,8 +40,7 @@ const Navbar = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setIsLoggedIn(false);
-    window.location.reload();
-    navigate("/");
+    navigate("/login");
   };
 
   const handleProfile = () => {
@@ -74,7 +72,7 @@ const Navbar = () => {
   const handlehome = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (!isLoggedIn) {
-      navigate("/");
+      navigate("/login");
       return;
     }
     if (user?.role === "admin") {
@@ -143,7 +141,7 @@ const Navbar = () => {
                   src={
                     user?.profileImage
                       ? `${frontendUrl}${user.profileImage}`
-                      : "/default-profile.png"
+                      : `${frontendUrl}${user.profileImage}`
                   }
                   alt="Profile"
                   className="w-7 h-7 rounded-full object-cover"

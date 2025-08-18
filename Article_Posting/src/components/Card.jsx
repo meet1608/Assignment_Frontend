@@ -1,102 +1,112 @@
 import React from "react";
 import {
-  Card, CardActionArea, CardMedia, CardContent, CardActions, Avatar,
-  IconButton, Typography, Tooltip
+  Card,
+  CardActionArea,
+  CardMedia,
+  CardContent,
+  CardActions,
+  Avatar,
+  IconButton,
+  Typography,
+  Tooltip,
 } from "@mui/material";
 import { FaPen } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
+import axios from "../components/TokenExpires";
 import "react-toastify/dist/ReactToastify.css";
-import profile from "../assets/images/profile.avif"
+import profile from "../assets/images/profile.avif";
 const formatDate = (iso) => new Date(iso).toLocaleDateString();
 
 export default function ImgMediaCard({ article }) {
   const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
-const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
+  const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
   const handleEdit = () => navigate(`/edit-article/${article._id}`);
 
   const handleDelete = (articleId) => {
-  toast(
-    ({ closeToast }) => (
-      <div style={{ padding: "8px" }}>
-        <p style={{ fontWeight: "bold", marginBottom: "10px" }}>
-          🗑 Are you sure you want to delete this article?
-        </p>
-        <div style={{ display: "flex", gap: "10px" }}>
-          <button
-            onClick={async () => {
-              try {
-                const token = localStorage.getItem("token");
-                await axios.delete(`${frontendUrl}/api/articles/delete/${articleId}`, {
-                  headers: { Authorization: `Bearer ${token}` },
-                });
-                closeToast();
-                toast.success("✅ Article deleted", { autoClose: 2000 });
-                window.location.reload();
-              } catch (error) {
-                console.error("Error deleting article:", error);
-                toast.error("❌ Failed to delete. Please try again.");
-              }
-            }}
-            style={{
-              background: "#ef4444",
-              color: "#fff",
-              border: "none",
-              padding: "6px 16px",
-              borderRadius: "6px",
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
-          >
-            Yes, Delete
-          </button>
-          <button
-            onClick={closeToast}
-            style={{
-              background: "#374151",
-              color: "#fff",
-              border: "none",
-              padding: "6px 16px",
-              borderRadius: "6px",
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
-          >
-            Cancel
-          </button>
+    toast(
+      ({ closeToast }) => (
+        <div style={{ padding: "8px" }}>
+          <p style={{ fontWeight: "bold", marginBottom: "10px" }}>
+            🗑 Are you sure you want to delete this article?
+          </p>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button
+              onClick={async () => {
+                try {
+                  const token = localStorage.getItem("token");
+                  await axios.delete(
+                    `${frontendUrl}/api/articles/delete/${articleId}`,
+                    {
+                      headers: { Authorization: `Bearer ${token}` },
+                    }
+                  );
+                  closeToast();
+                  toast.success("✅ Article deleted", { autoClose: 2000 });
+                  window.location.reload();
+                } catch (error) {
+                  console.error("Error deleting article:", error);
+                  toast.error("❌ Failed to delete. Please try again.");
+                }
+              }}
+              style={{
+                background: "#ef4444",
+                color: "#fff",
+                border: "none",
+                padding: "6px 16px",
+                borderRadius: "6px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+            >
+              Yes, Delete
+            </button>
+            <button
+              onClick={closeToast}
+              style={{
+                background: "#374151",
+                color: "#fff",
+                border: "none",
+                padding: "6px 16px",
+                borderRadius: "6px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
-      </div>
-    ),
-    {
-      autoClose: false,
-      closeOnClick: false,
-      style: {
-        background: "#1f2937",
-        color: "#f9fafb",
-        borderRadius: "10px",
-        boxShadow: "0 4px 15px rgba(0,0,0,0.22)",
-      },
-    }
-  );
-};
-
+      ),
+      {
+        autoClose: false,
+        closeOnClick: false,
+        style: {
+          background: "#1f2937",
+          color: "#f9fafb",
+          borderRadius: "10px",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.22)",
+        },
+      }
+    );
+  };
 
   return (
-  <Card
-  sx={{
-    width: "100%",
-    maxWidth: 400,
-    boxSizing: "border-box",
-    borderRadius: 4,
-    boxShadow: 4,
-    transition: "box-shadow 0.2s",
-    "&:hover": { boxShadow: 8 },
-  }}
-  elevation={0}
->
+    <Card
+      sx={{
+        width: "100%",
+        maxWidth: 400,
+        boxSizing: "border-box",
+        borderRadius: 4,
+        boxShadow: 4,
+        transition: "box-shadow 0.2s",
+        "&:hover": { boxShadow: 8 },
+      }}
+      elevation={0}
+    >
       <ToastContainer position="top-center" />
       <CardActionArea
         onClick={() => navigate(`/article/${article._id}`)}
@@ -104,10 +114,10 @@ const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
       >
         <CardMedia
           component="img"
-          image={`${frontendUrl}${article.articleImage}`|| profile}
+          image={`${frontendUrl}${article.articleImage}`}
           alt={article.title}
           sx={{
-            height: 340, 
+            height: 340,
             objectFit: "cover",
             borderRadius: 3,
           }}
@@ -115,30 +125,33 @@ const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
       </CardActionArea>
 
       <CardContent sx={{ pt: 2 }}>
-        <div style={{
-          display: "flex", alignItems: "center", marginBottom: "1em"
-        }}>
-          <Avatar
-            src={`${frontendUrl}${article.user.profileImage}`|| profile}
-            alt={article.user.firstName}
-            sx={{ width: 32, height: 32, bgcolor: "#3b82f6", marginRight: 1 }}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            marginBottom: "1em",
+          }}
+        >
+          <img
+            src={`${frontendUrl}${article.user.profileImage}`}
+            alt="Profile"
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "50%",
+              marginRight: "10px",
+            }}
           />
           <Typography variant="subtitle2">
             {article.user.firstName} {article.user.lastName}
           </Typography>
-          
         </div>
-         <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
+        <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
           {formatDate(article.createdAt)}
         </Typography>
-        <Typography variant="subtitle2">
-            {article.user.email}
-          </Typography>
-       
-        <Typography
-          variant="h6"
-          sx={{ fontWeight: 700, mt: 1, mb: 1.5 }}
-        >
+        {/* <Typography variant="subtitle2">{article.user.email}</Typography> */}
+
+        <Typography variant="h6" sx={{ fontWeight: 700, mt: 1, mb: 1.5 }}>
           {article.title}
         </Typography>
         <Typography
@@ -149,35 +162,47 @@ const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
             WebkitLineClamp: 3,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
-            minHeight: "3.6em"
+            minHeight: "3.6em",
           }}
         >
           {article.content}
         </Typography>
       </CardContent>
 
-      <CardActions disableSpacing sx={{ justifyContent: "flex-end", px: 2, pb: 1 }}>
+      <CardActions
+        disableSpacing
+        sx={{ justifyContent: "flex-end", px: 2, pb: 1 }}
+      >
         {(article.user._id === user?.id || user?.role === "admin") && (
           <>
-            <Tooltip title="Edit"><IconButton
-              color="info" onClick={handleEdit} sx={{
-                bgcolor: "background.paper",
-                "&:hover": { bgcolor: "#3b82f6", color: "#fff" }
-              }}>
-              <FaPen size={18} />
-            </IconButton></Tooltip>
-            <Tooltip title="Delete"><IconButton
-              color="error"
-              onClick={e => {
-                e.stopPropagation();
-                handleDelete(article._id);
-              }}
-              sx={{
-                bgcolor: "background.paper", ml: 0.5,
-                "&:hover": { bgcolor: "#ef4444", color: "#fff" }
-              }}>
-              <MdDelete size={22} />
-            </IconButton></Tooltip>
+            <Tooltip title="Edit">
+              <IconButton
+                color="info"
+                onClick={handleEdit}
+                sx={{
+                  bgcolor: "background.paper",
+                  "&:hover": { bgcolor: "#3b82f6", color: "#fff" },
+                }}
+              >
+                <FaPen size={18} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete">
+              <IconButton
+                color="error"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(article._id);
+                }}
+                sx={{
+                  bgcolor: "background.paper",
+                  ml: 0.5,
+                  "&:hover": { bgcolor: "#ef4444", color: "#fff" },
+                }}
+              >
+                <MdDelete size={22} />
+              </IconButton>
+            </Tooltip>
           </>
         )}
       </CardActions>

@@ -4,9 +4,9 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 
-// Yup schema for email validation
 const schema = yup.object().shape({
   email: yup.string().required("Email is required").email("Invalid email format"),
 });
@@ -21,13 +21,16 @@ const Forgot_password = () => {
   } = useForm({
     resolver: yupResolver(schema),
   });
-
+  const navigate = useNavigate();
   const onSubmit = async (data) => {
     try {
       const res = await axios.post(`${frontendUrl}/api/users/forgot-password`, {
         email: data.email,
       });
       toast.success(res.data.message || "Password reset link sent to your email");
+      setTimeout(() => {
+        navigate("/login");
+      },1000);
     } catch (err) {
       const message = err.response?.data?.message || "Failed to reset password";
       console.error("Forgot Password Error:", message);

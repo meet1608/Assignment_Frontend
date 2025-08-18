@@ -38,8 +38,10 @@ const Signup = () => {
 
       const response = await axios.post(`${frontendUrl}/api/users/create`, trimmedData);
 
-      toast.success(response.data.message || "Signup successful! Check your email.");
-      reset();
+      toast.success("Signup successful! Check your email.");
+      setTimeout(() => {
+        navigate("/login");
+      },500);
     } catch (error) {
       const errMsg =
         error.response?.data?.message ||

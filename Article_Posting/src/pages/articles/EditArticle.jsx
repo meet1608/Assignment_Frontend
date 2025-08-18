@@ -64,32 +64,39 @@ const EditArticle = () => {
     fetchArticle();
   }, [id]);
 
-  const onSubmit = async (data, articleType) => {
-    setSubmitting(true);
-    try {
-      const formData = new FormData();
-      formData.append("title", data.title);
-      formData.append("content", data.content);
-      formData.append("type", articleType);
-      if (newImage) formData.append("articleImage", newImage);
+ const onSubmit = async (data, articleType) => {
+  setSubmitting(true);
+  try {
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("content", data.content);
+    formData.append("type", articleType);
+    if (newImage) formData.append("articleImage", newImage);
 
-      await axios.put(`${frontendUrl}/api/articles/update/${id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+    await axios.put(`${frontendUrl}/api/articles/update/${id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    toast.success("Article updated successfully");
 
-      toast.success("Article updated successfully");
-      if (user?.role === "admin") navigate("/admin/articles");
-      else navigate("/");
-    } catch (error) {
-      console.error("Error updating article:", error.response?.data || error.message);
-      toast.error(error.response?.data?.message || "Failed to update article");
-    } finally {
-      setSubmitting(false);
+    let redirectPath = "/";
+    if (articleType === "published") {
+      redirectPath = user?.role === "admin" ? "/admin/articles" : "/";
+    } else if (articleType === "draft") {
+      redirectPath = "/draft-article";
     }
-  };
+
+    setTimeout(() => navigate(redirectPath), 500);
+  } catch (error) {
+    console.error("Error updating article:", error.response?.data || error.message);
+    toast.error(error.response?.data?.message || "Failed to update article");
+  } finally {
+    setSubmitting(false);
+  }
+};
+
 
   return (
     <Layout>
@@ -144,7 +151,7 @@ const EditArticle = () => {
               }`}
               disabled={submitting}
             >
-              {submitting ? "Submitting..." : "Update Article"}
+              {submitting ? "Submitting..." : "Publish Article"}
             </button>
           </div>
         </form>

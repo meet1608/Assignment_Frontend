@@ -25,10 +25,14 @@ const schema = yup.object().shape({
     .trim()
     .required("Email is required")
     .email("Invalid email format"),
+  role: yup.string().oneOf(["user", "admin"]).required("Role is required"),
 });
 
 const AdminAllUsers = () => {
-  const [users, setUsers] = useState([]);
+const [users, setUsers] = useState([]);
+const [page, setPage] = useState(1);
+const [limit] = useState(10); 
+const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -39,13 +43,14 @@ const AdminAllUsers = () => {
   setLoading(true);
   try {
     const res = await axios.get(`${frontendUrl}/api/users/all`, {
-      params: { search }, // send search query
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
+      params: { search, page, limit },
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
-    const filteredUsers = res.data.filter((user) => user.role !== "admin");
+    const { users, pagination } = res.data;
+    // Filter out the logged-in admin
+    const filteredUsers = users.filter((u) => u.id !== admin.id);
     setUsers(filteredUsers);
+    setTotalPages(pagination.totalPages);
   } catch (error) {
     console.error("Failed to fetch users:", error);
   } finally {
@@ -54,14 +59,14 @@ const AdminAllUsers = () => {
 };
 
 
-useEffect(() => {
-  const delayDebounce = setTimeout(() => {
-    fetchAllUsers(searchTerm);
-  }, 500); // 300ms debounce to reduce API calls
 
-  return () => clearTimeout(delayDebounce);
-}, [searchTerm]);
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      fetchAllUsers(searchTerm);
+    }, 500);
 
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm,page]);
 
   const {
     register,
@@ -78,9 +83,9 @@ useEffect(() => {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       toast.success(res.data.message || "User added successfully!");
-      fetchAllUsers(); 
+      fetchAllUsers();
       reset();
-      setIsModelOpen(false); 
+      setIsModelOpen(false);
     } catch (error) {
       const errMsg =
         error.response?.data?.message || error.message || "Failed to add user.";
@@ -91,8 +96,6 @@ useEffect(() => {
   useEffect(() => {
     fetchAllUsers();
   }, []);
-
- 
 
   const handleAddUser = () => {
     setIsModelOpen(true);
@@ -107,7 +110,7 @@ useEffect(() => {
           },
         });
       } catch (error) {
-        throw error; // propagate error to outer try-catch
+        throw error;
       }
     };
 
@@ -129,7 +132,7 @@ useEffect(() => {
                   toast.success("User deleted", { autoClose: 2000 });
                   setTimeout(() => {
                     window.location.reload();
-                  }, 2000);
+                  }, 500);
                 } catch (error) {
                   console.error("Error deleting user:", error);
                   toast.error("Failed to delete");
@@ -221,6 +224,7 @@ useEffect(() => {
                   <th className="border px-4 py-2 text-center align-middle">
                     Profile Picture
                   </th>
+
                   <th className="border px-4 py-2 text-center align-middle">
                     Full Name
                   </th>
@@ -263,7 +267,7 @@ useEffect(() => {
                       {user.role}
                     </td>
                     <td className="border px-4 py-2 text-center">
-{user.isEmailVerified ? "Yes" : "No"}
+                      {user.isEmailVerified ? "Yes" : "No"}
                     </td>
                     <td className="border px-4 py-2 flex justify-center gap-2">
                       {admin.id !== user._id && (
@@ -291,6 +295,24 @@ useEffect(() => {
                 ))}
               </tbody>
             </table>
+            <div className="flex justify-center mt-4 gap-2">
+  <button
+    disabled={page === 1}
+    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+    className="px-3 py-1 border rounded disabled:opacity-50"
+  >
+    Prev
+  </button>
+  <span className="px-3 py-1">{page} / {totalPages}</span>
+  <button
+    disabled={page === totalPages}
+    onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+    className="px-3 py-1 border rounded disabled:opacity-50"
+  >
+    Next
+  </button>
+</div>
+
           </div>
         )}
       </div>
@@ -344,6 +366,22 @@ useEffect(() => {
                 />
                 {errors.email && (
                   <p className="text-red-500 text-xs">{errors.email.message}</p>
+                )}
+              </div>
+              {/* Role */}
+              <div className="mb-4">
+                <select
+                  {...register("role")}
+                  defaultValue="user" // ✅ default selection
+                  className={`w-full border rounded px-3 py-2 ${
+                    errors.role ? "border-red-500" : ""
+                  }`}
+                >
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+                {errors.role && (
+                  <p className="text-red-500 text-xs">{errors.role.message}</p>
                 )}
               </div>
 

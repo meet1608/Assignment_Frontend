@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "../../components/TokenExpires";
 import { useForm } from "react-hook-form";
@@ -42,7 +42,7 @@ const Password_set = () => {
       toast.success(res.data.message || "Password set successfully");
       setTimeout(() => {
         navigate("/login");
-      }, 3000);
+      }, 500);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to set password");
       console.error("Error setting password:", err);
