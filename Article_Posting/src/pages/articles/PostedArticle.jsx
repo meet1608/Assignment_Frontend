@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Card from "../../components/Card";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
 
 const PostedArticle = () => {
   const [articles, setArticles] = useState([]);
@@ -12,13 +13,11 @@ const PostedArticle = () => {
   const [filter, setFilter] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(9);
   const [totalPages, setTotalPages] = useState(1);
+
   const navigate = useNavigate();
   const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
-
-  const handleArticle = () => {
-    navigate("/create-article");
-  };
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -27,7 +26,12 @@ const PostedArticle = () => {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  const fetchArticles = async (search = "", filterValue = "", currentPage = 1) => {
+  const fetchArticles = async (
+    search = "",
+    filterValue = "",
+    currentPage = 1,
+    limitValue = limit
+  ) => {
     setLoading(true);
     const token = localStorage.getItem("token");
     if (!token) {
@@ -45,19 +49,16 @@ const PostedArticle = () => {
           all,
           type: "published",
           page: currentPage,
-          limit: 9
+          limit: limitValue,
         },
       });
-      const articlesData =
-        res.data?.articles?.articles || res.data?.articles || [];
+      const articlesData = res.data?.articles?.articles || res.data?.articles || [];
       setArticles(Array.isArray(articlesData) ? articlesData : []);
       setTotalPages(res.data?.pagination?.totalPages || 1);
     } catch (error) {
       if (error.response?.status === 403) {
-        console.warn("Access denied: You don't have permission to view published articles.");
         toast.error("You don’t have permission to view published articles.");
       } else {
-        console.error("Error fetching articles:", error);
         toast.error("Failed to fetch articles. Please try again.");
       }
       setArticles([]);
@@ -68,22 +69,24 @@ const PostedArticle = () => {
   };
 
   useEffect(() => {
-    fetchArticles(debouncedSearchTerm.trim(), filter, page);
-  }, [debouncedSearchTerm, filter, page]);
+    fetchArticles(debouncedSearchTerm.trim(), filter, page, limit);
+  }, [debouncedSearchTerm, filter, page, limit]);
+
+  const handleArticle = () => navigate("/create-article");
 
   return (
-    <div className="p-6 sm:pl-36 sm:pr-24 min-h-screen bg-gray-50">
+    <div className="p-6 sm:pl-36 sm:pr-24 min-h-screen bg-gray-50 ">
       <ToastContainer />
-      <div className="mb-6 flex flex-col sm:flex-row gap-4 justify-center">
+      <div className="mb-6 flex flex-col sm:flex-row gap-4 justify-center items-center">
         <input
           type="text"
           placeholder="Search by title, author name, or email..."
-          className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/2"
+          className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <select
-          className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4"
+          className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={filter}
           onChange={(e) => {
             setFilter(e.target.value);
@@ -93,45 +96,59 @@ const PostedArticle = () => {
           <option value="">All Articles</option>
           <option value="my-articles">My Articles</option>
         </select>
-        <div
-          className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4 cursor-pointer text-center"
+        <button
+          className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 w-full sm:w-1/4 transition-colors"
           onClick={handleArticle}
         >
           Add Article
-        </div>
+        </button>
       </div>
+
       {loading ? (
         <p className="text-center text-lg text-gray-500">Loading Articles...</p>
       ) : articles.length === 0 ? (
-        <p className="text-center text-lg text-red-500">
-          No articles found.
-        </p>
+        <p className="text-center text-lg text-red-500">No articles found.</p>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {articles.map((article, idx) => (
               <Card key={article._id || article.id || idx} article={article} />
             ))}
           </div>
-          {/* Pagination */}
-          <div className="flex justify-center items-center gap-4 mt-6">
-            <button
-              disabled={page === 1}
-              onClick={() => setPage((prev) => prev - 1)}
-              className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
+            <div className="flex items-center gap-4">
+              <button
+                disabled={page === 1}
+                onClick={() => setPage((prev) => prev - 1)}
+                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition-colors"
+              >
+              <FaArrowLeft />
+              </button>
+              <span className="text-gray-700">
+                Page {page} of {totalPages}
+              </span>
+              <button
+                disabled={page === totalPages}
+                onClick={() => setPage((prev) => prev + 1)}
+                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition-colors"
+              >
+                <FaArrowRight />
+              </button>
+            </div>
+            <select
+              className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={limit}
+              onChange={(e) => {
+                setLimit(Number(e.target.value));
+                setPage(1);
+              }}
             >
-              Prev
-            </button>
-            <span>
-              Page {page} of {totalPages}
-            </span>
-            <button
-              disabled={page === totalPages}
-              onClick={() => setPage((prev) => prev + 1)}
-              className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
-            >
-              Next
-            </button>
+              <option value={3}>3 per page</option>
+              <option value={5}>5 per page</option>
+              <option value={6}>6 per page</option>
+              <option value={9}>9 per page</option>
+            </select>
           </div>
         </>
       )}

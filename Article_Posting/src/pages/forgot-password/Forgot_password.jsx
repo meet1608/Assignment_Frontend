@@ -6,6 +6,7 @@ import * as yup from "yup";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
+import im3 from "../../assets/images/signup.jpg";
 
 const schema = yup.object().shape({
   email: yup.string().required("Email is required").email("Invalid email format"),
@@ -39,12 +40,16 @@ const Forgot_password = () => {
   };
 
   return (
-    <div>
-      <ToastContainer position="top-center" />
-      <h1 className="text-3xl font-bold text-center mt-8">Forgot Password</h1>
+  <div
+  className="min-h-screen flex items-center justify-center bg-cover bg-center"
+style={{ backgroundImage: `url(${im3})` }}
+>          <ToastContainer position="top-center" />
+
+  <div className="bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-lg w-full max-w-md">
+      <h1 className="text-3xl font-semibold text-center mb-8">Forgot Password</h1>
       <form className="max-w-md mx-auto mt-8" onSubmit={handleSubmit(onSubmit)} noValidate>
         <div className="mb-4">
-          <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
+          <label htmlFor="email" className="block text-gray-700 text-sm font-semibold mb-2">
             Email
           </label>
           <input
@@ -67,12 +72,21 @@ const Forgot_password = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
+            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
           >
             {isSubmitting ? "Sending..." : "Submit"}
           </button>
         </div>
       </form>
+      <div className="text-center mt-4">
+        <p className="text-gray-600">
+          Remembered your password?{" "}
+          <a href="/login" className="text-blue-500 hover:text-blue-700">
+            Login
+          </a>
+        </p>
+      </div>
+      </div>
     </div>
   );
 };

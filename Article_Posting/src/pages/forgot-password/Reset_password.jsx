@@ -8,6 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaEye } from "react-icons/fa";
 import { GoEyeClosed } from "react-icons/go";
+import im3 from "../../assets/images/signup.jpg";
 
 const schema = yup.object().shape({
   password: yup
@@ -56,9 +57,13 @@ const Reset_password = () => {
   };
 
   return (
-    <div>
-      <ToastContainer position="top-center" />
-      <h1 className="text-3xl font-bold text-center mt-8">Reset Password</h1>
+  <div
+  className="min-h-screen flex items-center justify-center bg-cover bg-center"
+style={{ backgroundImage: `url(${im3})` }}
+>          <ToastContainer position="top-center" />
+
+  <div className="bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-lg w-full max-w-md">
+      <h1 className="text-3xl font-semibold text-center mt-8">Reset Password</h1>
       <form
         className="max-w-md mx-auto mt-8"
         onSubmit={handleSubmit(onSubmit)}
@@ -68,7 +73,7 @@ const Reset_password = () => {
         <div className="mb-4">
           <label
             htmlFor="password"
-            className="block text-gray-700 text-sm font-bold mb-2"
+            className="block text-gray-700 text-sm font-semibold mb-2"
           >
             New Password
           </label>
@@ -101,7 +106,7 @@ const Reset_password = () => {
         <div className="mb-4">
           <label
             htmlFor="confirmPassword"
-            className="block text-gray-700 text-sm font-bold mb-2"
+            className="block text-gray-700 text-sm font-semibold mb-2"
           >
             Confirm Password
           </label>
@@ -133,11 +138,12 @@ const Reset_password = () => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
+          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
         >
           {isSubmitting ? "Resetting..." : "Reset Password"}
         </button>
       </form>
+      </div>
     </div>
   );
 };

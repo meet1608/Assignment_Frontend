@@ -2,14 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { CiUser } from "react-icons/ci";
 
-const Navbar = () => {
+const Navbar = ({ user, setUser }) => {
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem("user"));
   const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
   const isActive = (path) =>
@@ -18,7 +17,6 @@ const Navbar = () => {
       : "hover:bg-yellow-300  hover:text-black";
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const user = JSON.parse(localStorage.getItem("user"));
     if (token && user) {
       setIsLoggedIn(true);
     } else {
@@ -36,10 +34,18 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(()=>{
+    const user = JSON.parse(localStorage.getItem("user"));
+   if(user?.role === "admin"){
+    navigate("/admin/articles");
+   }
+  },[])
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setIsLoggedIn(false);
+        setUser(null); 
     navigate("/login");
   };
 

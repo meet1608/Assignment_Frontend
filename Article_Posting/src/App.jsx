@@ -26,7 +26,6 @@ import Articles from "./pages/articles/Articles";
 import Edit_User from "./pages/admin-home/Edit_User";
 import LayoutWithNavbar from './components/navbarComponents/LayoutWithNavbar';
 import LayoutWithoutNavbar from './components/navbarComponents/LayoutWithoutNavbar';
-
 function App() {
   return (
     <Router>

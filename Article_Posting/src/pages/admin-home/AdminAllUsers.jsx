@@ -9,6 +9,8 @@ import { MdDelete } from "react-icons/md";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import profile from "../../assets/images/profile.avif";
+import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
+
 const schema = yup.object().shape({
   firstName: yup
     .string()
@@ -29,36 +31,33 @@ const schema = yup.object().shape({
 });
 
 const AdminAllUsers = () => {
-const [users, setUsers] = useState([]);
-const [page, setPage] = useState(1);
-const [limit] = useState(10); 
-const [totalPages, setTotalPages] = useState(1);
+  const [users, setUsers] = useState([]);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const admin = JSON.parse(localStorage.getItem("user"));
   const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
   const [ismodelopen, setIsModelOpen] = useState(false);
-  const fetchAllUsers = async (search = "") => {
-  setLoading(true);
-  try {
-    const res = await axios.get(`${frontendUrl}/api/users/all`, {
-      params: { search, page, limit },
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    });
-    const { users, pagination } = res.data;
-    // Filter out the logged-in admin
-    const filteredUsers = users.filter((u) => u.id !== admin.id);
-    setUsers(filteredUsers);
-    setTotalPages(pagination.totalPages);
-  } catch (error) {
-    console.error("Failed to fetch users:", error);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+  const fetchAllUsers = async (search = "", limitValue = limit) => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${frontendUrl}/api/users/all`, {
+        params: { search, page, limit: limitValue },
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      const { users, pagination } = res.data;
+      setUsers(users);
+      console.log(users.length);
+      setTotalPages(pagination.totalPages);
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -66,7 +65,7 @@ const [totalPages, setTotalPages] = useState(1);
     }, 500);
 
     return () => clearTimeout(delayDebounce);
-  }, [searchTerm,page]);
+  }, [searchTerm, page, limit]);
 
   const {
     register,
@@ -204,7 +203,7 @@ const [totalPages, setTotalPages] = useState(1);
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <div
-            className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4 cursor-pointer text-center"
+            className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 w-full sm:w-1/4 transition-colors text-center cursor-pointer"
             onClick={handleAddUser}
           >
             Add User
@@ -218,7 +217,7 @@ const [totalPages, setTotalPages] = useState(1);
           </p>
         ) : (
           <div>
-            <table className="min-w-full mt-4 border">
+            <table className="min-w-full mt-4 border border-gray-300 rounded-lg">
               <thead>
                 <tr>
                   <th className="border px-4 py-2 text-center align-middle">
@@ -296,23 +295,40 @@ const [totalPages, setTotalPages] = useState(1);
               </tbody>
             </table>
             <div className="flex justify-center mt-4 gap-2">
-  <button
-    disabled={page === 1}
-    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-    className="px-3 py-1 border rounded disabled:opacity-50"
-  >
-    Prev
-  </button>
-  <span className="px-3 py-1">{page} / {totalPages}</span>
-  <button
-    disabled={page === totalPages}
-    onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-    className="px-3 py-1 border rounded disabled:opacity-50"
-  >
-    Next
-  </button>
-</div>
+              <button
+                disabled={page === 1}
+                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                className="px-3 py-1 border rounded disabled:opacity-50"
+              >
+                <FaArrowLeft />
+              </button>
+              <span className="px-3 py-1">
+                {page} / {totalPages}
+              </span>
+              <button
+                disabled={page === totalPages}
+                onClick={() =>
+                  setPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                className="px-3 py-1 border rounded disabled:opacity-50"
+              >
+                <FaArrowRight />
+              </button>
 
+              <select
+                className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={limit}
+                onChange={(e) => {
+                  setLimit(Number(e.target.value));
+                  setPage(1);
+                }}
+              >
+                <option value={5}>5 per page</option>
+                <option value={10}>10 per page</option>
+                <option value={15}>15 per page</option>
+                <option value={20}>20 per page</option>
+              </select>
+            </div>
           </div>
         )}
       </div>
@@ -404,6 +420,7 @@ const [totalPages, setTotalPages] = useState(1);
               </div>
             </form>
           </div>
+          
         </div>
       )}
     </div>

@@ -149,7 +149,6 @@ export default function ImgMediaCard({ article }) {
         <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
           {formatDate(article.createdAt)}
         </Typography>
-        {/* <Typography variant="subtitle2">{article.user.email}</Typography> */}
 
         <Typography variant="h6" sx={{ fontWeight: 700, mt: 1, mb: 1.5 }}>
           {article.title}

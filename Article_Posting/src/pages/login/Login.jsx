@@ -9,6 +9,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "../../components/TokenExpires";
 import { FaEye } from "react-icons/fa";
 import { GoEyeClosed } from "react-icons/go";
+import im1 from "../../assets/images/login.jpg";
+import im2 from "../../assets/images/home.jpg";
+import im3 from "../../assets/images/signup.jpg";
 
 const schema = yup.object().shape({
   email: yup
@@ -64,19 +67,20 @@ const Login = () => {
   };
 
   return (
-    <div>
+    <div
+      className="min-h-screen flex items-center justify-center bg-cover bg-center"
+      style={{ backgroundImage: `url(${im3})` }}
+    >
+      {" "}
       <ToastContainer position="top-center" />
-      <div>
-        <h1 className="text-3xl font-bold text-center mt-8">Login</h1>
-        <form
-          className="max-w-md mx-auto mt-8"
-          onSubmit={handleSubmit(onSubmit)}
-          noValidate
-        >
+      <div className="bg-white/80 backdrop-blur-lg p-8 rounded-2xl shadow-lg w-full max-w-md">
+        <h1 className="text-3xl font-semibold text-center mb-8">Login</h1>
+
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <div className="mb-4">
             <label
               htmlFor="email"
-              className="block text-gray-700 text-sm font-bold mb-2"
+              className="block text-gray-700 text-sm font-semibold mb-2"
             >
               Email
             </label>
@@ -88,10 +92,9 @@ const Login = () => {
                 errors.email ? "border-red-500" : ""
               }`}
               placeholder="Enter your email"
-              aria-invalid={errors.email ? "true" : "false"}
             />
             {errors.email && (
-              <p className="text-red-500 text-xs italic" role="alert">
+              <p className="text-red-500 text-xs italic">
                 {errors.email.message}
               </p>
             )}
@@ -100,11 +103,10 @@ const Login = () => {
           <div className="mb-6">
             <label
               htmlFor="password"
-              className="block text-gray-700 text-sm font-bold mb-2"
+              className="block text-gray-700 text-sm font-semibold mb-2"
             >
               Password
             </label>
-            {/* Wrap the password input + button together */}
             <div className="relative">
               <input
                 id="password"
@@ -114,10 +116,7 @@ const Login = () => {
                   errors.password ? "border-red-500" : ""
                 }`}
                 placeholder="Enter your password"
-                aria-invalid={errors.password ? "true" : "false"}
               />
-
-              {/* Eye toggle button inside input */}
               <button
                 type="button"
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
@@ -126,23 +125,20 @@ const Login = () => {
                 {showPassword ? <GoEyeClosed /> : <FaEye />}
               </button>
             </div>
-
             {errors.password && (
-              <p className="text-red-500 text-xs italic" role="alert">
+              <p className="text-red-500 text-xs italic">
                 {errors.password.message}
               </p>
             )}
           </div>
 
-          <div className="flex items-center justify-between">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
-            >
-              {isSubmitting ? "Logging in..." : "Log In"}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
+          >
+            {isSubmitting ? "Logging in..." : "Log In"}
+          </button>
         </form>
 
         <div className="text-center mt-4">
@@ -153,7 +149,6 @@ const Login = () => {
             </a>
           </p>
         </div>
-
         <div className="text-center mt-4">
           <p className="text-gray-600">
             Don't remember your password?{" "}

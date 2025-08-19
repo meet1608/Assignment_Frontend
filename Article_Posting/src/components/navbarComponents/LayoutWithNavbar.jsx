@@ -1,16 +1,28 @@
-// LayoutWithNavbar.jsx
 import { Outlet } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Navbar from "../Navbar";
 import Footer from "../Footer";
 
-const LayoutWithNavbar = () => (
-  <div className="flex flex-col min-h-screen">
-    <Navbar />
-        <div className="flex-grow mt-16">
-    <Outlet />
+const LayoutWithNavbar = () => {
+  const [user, setUser] = useState(() => {
+    const stored = localStorage.getItem("user");
+    return stored ? JSON.parse(stored) : null;
+  });
+
+  useEffect(() => {
+    const stored = localStorage.getItem("user");
+    if (stored) setUser(JSON.parse(stored));
+  }, []);
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Navbar user={user} setUser={setUser} /> 
+      <div className="flex-grow mt-16">
+        <Outlet context={{ user, setUser }} />
+      </div>
+      <Footer />
     </div>
-    <Footer />
-  </div>
-);
+  );
+};
 
 export default LayoutWithNavbar;

@@ -5,9 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { IoMdArrowBack } from "react-icons/io";
-import Layout from "../../components/Layout";
+import Layout from "../../components/proflayout";
 import axios from "../../components/TokenExpires";
 import profile1 from "../../assets/images/profile.avif";
+import { useOutletContext } from "react-router-dom";
+import im1 from "../../assets/images/login.jpg";
+
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,33 +20,36 @@ const Profile = () => {
     lastName: "",
     profileImage: "",
   });
+  const { user, setUser } = useOutletContext();
+
   const [selectedFile, setSelectedFile] = useState(null);
   const navigate = useNavigate();
   const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
-const fetchProfileDetails = async () => {
-  setLoading(true);
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (!user?.id) {
-    setLoading(false);
-    return;
-  }
+  const fetchProfileDetails = async () => {
+    setLoading(true);
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
 
-  try {
-    const response = await axios.get(`${frontendUrl}/api/users/get/${user.id}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-    setProfile(response.data);
-  } catch (error) {
-    console.error("Error fetching profile details:", error);
-    toast.error("Failed to fetch profile details");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+    try {
+      const response = await axios.get(
+        `${frontendUrl}/api/users/get/${user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setProfile(response.data);
+    } catch (error) {
+      console.error("Error fetching profile details:", error);
+      toast.error("Failed to fetch profile details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchProfileDetails();
@@ -96,49 +102,50 @@ const fetchProfileDetails = async () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  const user = JSON.parse(localStorage.getItem("user"));
-  const formData = new FormData();
-  formData.append("firstName", form.firstName);
-  formData.append("lastName", form.lastName);
-  if (selectedFile) {
-    formData.append("profileImage", selectedFile);
-  }
+    e.preventDefault();
+    setLoading(true);
+    const user = JSON.parse(localStorage.getItem("user"));
+    const formData = new FormData();
+    formData.append("firstName", form.firstName);
+    formData.append("lastName", form.lastName);
+    if (selectedFile) {
+      formData.append("profileImage", selectedFile);
+    }
 
-  try {
-    const { data } = await axios.put(
-      `${frontendUrl}/api/users/update/${user.id}`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-    localStorage.setItem("user", JSON.stringify(data.user));
-    setProfile(data.user);
-    setShowModal(false);
-    toast.success("Profile updated successfully");
-    window.location.reload();
-  } catch (err) {
-    console.error("Error updating profile:", err);
-    toast.error(err.response?.data?.message || "Failed to update profile");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+    try {
+      const { data } = await axios.put(
+        `${frontendUrl}/api/users/update/${user.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      localStorage.setItem("user", JSON.stringify(data.user));
+      setProfile(data.user);
+      setShowModal(false);
+      toast.success("Profile updated successfully");
+      setUser(data.user);
+      // window.location.reload();
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      toast.error(err.response?.data?.message || "Failed to update profile");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Layout>
-      <div className="flex flex-col">
+      <div className="relative flex flex-col ">
         <ToastContainer position="top-center" />
+       
 
-        <div className="flex-grow flex items-center justify-center py-10">
-          <div className="w-full max-w-xl bg-white rounded-2xl shadow-xl px-8 py-10">
+
+        <div className="relative flex-grow flex items-center justify-center py-10 ">
+          <div className="w-full max-w-xl bg-white rounded-2xl shadow-xl px-8 py-10 bg-white/90 backdrop-blur-sm">
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
