@@ -5,7 +5,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import ProtectedRoute from "./protectedRoutes/protectedRoutes";
-
+import AdminProtected from "./protectedRoutes/AdminProtected";
 import Home from "./pages/home/Home";
 import Signup from "./pages/signup/Signup";
 import Login from "./pages/login/Login";
@@ -48,9 +48,9 @@ function App() {
           <Route
             path="/admin/articles"
             element={
-              <ProtectedRoute>
+              <AdminProtected>
                 <Admin_home />
-              </ProtectedRoute>
+              </AdminProtected>
             }
           />
           <Route
@@ -104,17 +104,17 @@ function App() {
           <Route
             path="/admin/users"
             element={
-              <ProtectedRoute>
+              <AdminProtected>
                 <AdminAllUsers />
-              </ProtectedRoute>
+              </AdminProtected>
             }
           />
           <Route
             path="/admin/edit-user/:id"
             element={
-              <ProtectedRoute>
+              <AdminProtected>
                 <Edit_User />
-              </ProtectedRoute>
+              </AdminProtected>
             }
           />
         </Route>

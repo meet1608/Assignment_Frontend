@@ -30,7 +30,7 @@ const PostedArticle = () => {
       navigate("/");
     }
 
-  })
+  },[navigate]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
