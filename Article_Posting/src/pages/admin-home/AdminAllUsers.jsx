@@ -10,6 +10,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import profile from "../../assets/images/profile.avif";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
+import {jwtDecode} from "jwt-decode";
 
 const schema = yup.object().shape({
   firstName: yup
@@ -39,6 +40,8 @@ const AdminAllUsers = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const admin = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token");
+  const decode = jwtDecode(token);
   const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
   const [ismodelopen, setIsModelOpen] = useState(false);
   const fetchAllUsers = async (search = "", limitValue = limit) => {
@@ -125,7 +128,7 @@ const AdminAllUsers = () => {
                 try {
                   await deleteUser();
                   setUsers((prevUsers) =>
-                    prevUsers.filter((user) => user._id !== userId)
+                    prevUsers.filter((user) => user.id !== userId)
                   );
                   closeToast();
                   toast.success("User deleted", { autoClose: 2000 });
@@ -244,8 +247,8 @@ const AdminAllUsers = () => {
               </thead>
               <tbody>
                 {users.map((user) => (
-                  <tr key={user._id}>
-                    <td className="border px-4 py-2 text-center">
+                  <tr key={user.id}>
+                    <td className="border px-4 py-2 text-center ">
                       <img
                         src={
                           user.profileImage
@@ -269,7 +272,6 @@ const AdminAllUsers = () => {
                       {user.isEmailVerified ? "Yes" : "No"}
                     </td>
                     <td className="border px-4 py-2 flex justify-center gap-2">
-                      {admin.id !== user._id && (
                         <button
                           className="text-blue-500 hover:bg-blue-700 hover:text-white font-bold py-2 px-4 rounded"
                           onClick={() =>
@@ -280,15 +282,14 @@ const AdminAllUsers = () => {
                         >
                           <FaPen className="h-5 w-5" />
                         </button>
-                      )}
-                      {admin.id !== user._id && (
+                      
                         <button
                           className="text-red-500 hover:bg-red-700 hover:text-white font-bold py-2 px-4 rounded"
                           onClick={() => handleDeleteUser(user.id)}
                         >
                           <MdDelete className="h-6 w-6" />
                         </button>
-                      )}
+                      
                     </td>
                   </tr>
                 ))}

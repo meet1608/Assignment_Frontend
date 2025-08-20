@@ -12,6 +12,7 @@ import { GoEyeClosed } from "react-icons/go";
 import im1 from "../../assets/images/login.jpg";
 import im2 from "../../assets/images/home.jpg";
 import im3 from "../../assets/images/signup.jpg";
+import {jwtDecode} from "jwt-decode";
 
 const schema = yup.object().shape({
   email: yup
@@ -54,8 +55,11 @@ const Login = () => {
         localStorage.setItem("token", resData.token);
         localStorage.setItem("user", JSON.stringify(resData.user));
 
+        const token = localStorage.getItem("token");
+        const decode = jwtDecode(token);
+
         const redirectPath =
-          resData.user?.role === "admin" ? "/admin/articles" : "/";
+          decode?.role === "admin" ? "/admin/articles" : "/";
         setTimeout(() => {
           navigate(redirectPath);
         }, 500);

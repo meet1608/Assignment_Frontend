@@ -15,6 +15,7 @@ const Navbar = ({ user, setUser }) => {
     location.pathname === path
       ? "bg-yellow-300 "
       : "hover:bg-yellow-300  hover:text-black";
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token && user) {
@@ -34,18 +35,18 @@ const Navbar = ({ user, setUser }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(()=>{
-    const user = JSON.parse(localStorage.getItem("user"));
-   if(user?.role === "admin"){
-    navigate("/admin/articles");
-   }
-  },[])
+  // useEffect(() => {
+  //   const user = JSON.parse(localStorage.getItem("user"));
+  //   if (user?.role === "admin") {
+  //     navigate("/admin/articles");
+  //   }
+  // }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setIsLoggedIn(false);
-        setUser(null); 
+    setUser(null);
     navigate("/login");
   };
 
@@ -135,8 +136,6 @@ const Navbar = ({ user, setUser }) => {
           </button>
         </div>
         <div className="hidden md:flex space-x-6 items-center">
-       
-
           {isLoggedIn ? (
             <div className="relative " ref={dropdownRef}>
               <button
@@ -154,8 +153,7 @@ const Navbar = ({ user, setUser }) => {
                 />
                 {/* Username */}
                 <span className="text-white font-medium">
-                  {user?.firstName}{" "}
-                  {user?.lastName}
+                  {user?.firstName} {user?.lastName}
                 </span>
               </button>
               {openDropdown && (

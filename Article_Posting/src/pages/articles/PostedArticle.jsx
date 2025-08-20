@@ -5,6 +5,7 @@ import Card from "../../components/Card";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
+import {jwtDecode} from "jwt-decode";
 
 const PostedArticle = () => {
   const [articles, setArticles] = useState([]);
@@ -18,6 +19,18 @@ const PostedArticle = () => {
 
   const navigate = useNavigate();
   const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
+
+
+  useEffect(()=>{
+    const user = JSON.parse(localStorage.getItem("user"));
+    if(user?.role === "admin"){
+      navigate("/admin/articles");
+    }
+    else{
+      navigate("/");
+    }
+
+  })
 
   useEffect(() => {
     const handler = setTimeout(() => {
