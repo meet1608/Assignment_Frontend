@@ -60,11 +60,8 @@ const Signup = () => {
         navigate("/login");
       }, 1000);
     } catch (error) {
-      const errMsg =
-        error.response?.data?.message ||
-        error.message ||
-        "Signup failed. Please try again.";
-      toast.error(errMsg);
+      
+      toast.error("Signup failed. Please try again.");
       console.error("Signup error:", error);
     }
   };
@@ -89,7 +86,7 @@ const Signup = () => {
             htmlFor="firstName"
             className="block text-gray-700 text-sm font-semibold mb-2"
           >
-            First Name
+            First Name<span className="text-red-500"> *</span>
           </label>
           <input
             id="firstName"
@@ -111,7 +108,7 @@ const Signup = () => {
             htmlFor="lastName"
             className="block text-gray-700 text-sm font-semibold mb-2"
           >
-            Last Name
+            Last Name<span className="text-red-500"> *</span>
           </label>
           <input
             id="lastName"
@@ -133,7 +130,7 @@ const Signup = () => {
             htmlFor="email"
             className="block text-gray-700 text-sm font-semibold mb-2"
           >
-            Email
+            Email<span className="text-red-500"> *</span>
           </label>
           <input
             id="email"

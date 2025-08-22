@@ -49,7 +49,7 @@ const Login = () => {
       );
 
       const resData = response.data;
-      toast.success(resData.message || "Login successful!");
+      toast.success("Login successful!");
 
       if (resData.message === "Login successful" || resData.token) {
         localStorage.setItem("token", resData.token);
@@ -65,7 +65,7 @@ const Login = () => {
         }, 500);
       }
     } catch (error) {
-      toast.error("Login failed. Please try again.");
+      toast.error("Email or password is incorrect. Please try again.");
       console.error("Login error:", error);
     }
   };
@@ -86,7 +86,7 @@ const Login = () => {
               htmlFor="email"
               className="block text-gray-700 text-sm font-semibold mb-2"
             >
-              Email
+              Email<span className="text-red-500"> *</span>
             </label>
             <input
               id="email"
@@ -109,7 +109,7 @@ const Login = () => {
               htmlFor="password"
               className="block text-gray-700 text-sm font-semibold mb-2"
             >
-              Password
+              Password<span className="text-red-500"> *</span>
             </label>
             <div className="relative">
               <input

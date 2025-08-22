@@ -5,11 +5,13 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { IoMdArrowBack } from "react-icons/io";
-import Layout from "../../components/proflayout";
 import axios from "../../components/TokenExpires";
 import profile1 from "../../assets/images/profile.avif";
 import { useOutletContext } from "react-router-dom";
 import im1 from "../../assets/images/login.jpg";
+import SideBar from "../../components/AdminSideBar";
+import BackButton from "../../components/BackButtons";
+import { useLocation } from "react-router-dom";
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
@@ -50,10 +52,11 @@ const Profile = () => {
       setLoading(false);
     }
   };
+  const location = useLocation();
 
   useEffect(() => {
     fetchProfileDetails();
-  }, []);
+  }, [location.pathname]);
 
   if (loading)
     return (
@@ -131,190 +134,216 @@ const Profile = () => {
       // window.location.reload();
     } catch (err) {
       console.error("Error updating profile:", err);
-      toast.error(err.response?.data?.message || "Failed to update profile");
+      toast.error("Failed to update profile");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Layout>
-      <div className="relative flex flex-col ">
-        <ToastContainer position="top-center" />
-       
+    <div
+      className="flex min-h-screen bg-cover bg-center"
+      style={{ backgroundImage: `url(${im1})` }}
+    >
+      {profile && profile.role === "admin" && (
+        <div className="w-64">
+          <SideBar />
+        </div>
+      )}
 
+      <div className="flex-1 relative z-10 pt-4">
+        <div className="absolute inset-0 bg-black/40"></div>
+        {profile.role === "user" ? (
+          <div className="p-6 sm:pl-36 sm:pr-24">
+            <BackButton />
+          </div>
+        ) : (
+          <div className="ml-4">
+            <BackButton />
+          </div>
+        )}
+        <div className="relative z-20 flex flex-col">
+          <ToastContainer position="top-center" />
 
-        <div className="relative flex-grow flex items-center justify-center py-10 ">
-          <div className="w-full max-w-xl bg-white rounded-2xl shadow-xl px-8 py-10 bg-white/90 backdrop-blur-sm">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-800 tracking-tight">
-                  My Profile
-                </h1>
-                <span className="text-gray-400 text-sm">
-                  Account settings & details
-                </span>
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={handleProfile}
-                  title="Edit Profile"
-                  className="p-2 rounded-full text-blue-600 border border-gray-200 hover:bg-blue-600 hover:text-white transition-colors"
-                >
-                  <FaPen className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-            <div className="flex flex-col items-center my-6">
-              <div className="relative">
-                <img
-                  src={
-                    profile.profileImage
-                      ? `${frontendUrl}${profile.profileImage}`
-                      : profile1
-                  }
-                  alt="Profile"
-                  className="w-32 h-32 object-cover rounded-full border-4 border-blue-200 shadow"
-                />
-              </div>
-              <h2 className="text-xl font-semibold text-gray-700 mt-4">
-                {profile.firstName} {profile.lastName}
-              </h2>
-              <span className="text-gray-500">{profile.email}</span>
-            </div>
-            <div className="mt-6">
-              <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+          <div className="relative flex-grow flex items-center justify-center py-10">
+            <div className="w-full max-w-xl bg-white rounded-2xl shadow-xl px-8 py-10 bg-white/90 backdrop-blur-sm">
+              {/* Header */}
+              <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-xs text-gray-400 font-medium">
-                    First Name
-                  </div>
-                  <div className="text-base font-semibold text-gray-700">
-                    {profile.firstName}
-                  </div>
+                  <h1 className="text-3xl font-bold text-gray-800 tracking-tight">
+                    My Profile
+                  </h1>
+                  <span className="text-gray-400 text-sm">
+                    Account settings & details
+                  </span>
                 </div>
-                <div>
-                  <div className="text-xs text-gray-400 font-medium">
-                    Last Name
-                  </div>
-                  <div className="text-base font-semibold text-gray-700">
-                    {profile.lastName}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-400 font-medium">Email</div>
-                  <div className="text-base font-medium text-gray-600">
-                    {profile.email}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-xs text-gray-400 font-medium">Role</div>
-                  <div className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mt-1">
-                    {profile.role}
-                  </div>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={handleProfile}
+                    title="Edit Profile"
+                    className="p-2 rounded-full text-blue-600 border border-gray-200 hover:bg-blue-600 hover:text-white transition-colors"
+                  >
+                    <FaPen className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
-            </div>
-            {showModal && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-8 relative">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-bold text-gray-800">
-                      Update Profile
-                    </h2>
-                    <button
-                      onClick={() => setShowModal(false)}
-                      className="text-gray-500 hover:text-gray-700 focus:outline-none"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                  <form onSubmit={handleSubmit}>
-                    <div className="mb-4">
-                      <label className="block text-gray-500 text-sm mb-1 font-medium">
-                        First Name
-                      </label>
-                      <input
-                        type="text"
-                        name="firstName"
-                        value={form.firstName}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                        required
-                      />
+
+              <div className="flex flex-col items-center my-6">
+                <div className="relative">
+                  <img
+                    src={
+                      profile.profileImage
+                        ? `${frontendUrl}${profile.profileImage}`
+                        : profile1
+                    }
+                    alt="Profile"
+                    className="w-32 h-32 object-cover rounded-full border-4 border-blue-200 shadow"
+                  />
+                </div>
+                <h2 className="text-xl font-semibold text-gray-700 mt-4">
+                  {profile.firstName} {profile.lastName}
+                </h2>
+                <span className="text-gray-500">{profile.email}</span>
+              </div>
+
+              <div className="mt-6">
+                <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                  <div>
+                    <div className="text-xs text-gray-400 font-medium">
+                      First Name
                     </div>
-                    <div className="mb-4">
-                      <label className="block text-gray-500 text-sm mb-1 font-medium">
-                        Last Name
-                      </label>
-                      <input
-                        type="text"
-                        name="lastName"
-                        value={form.lastName}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                        required
-                      />
+                    <div className="text-base font-semibold text-gray-700">
+                      {profile.firstName}
                     </div>
-                    <div className="mb-4">
-                      <label className="block text-gray-500 text-sm mb-1 font-medium">
-                        Profile Image
-                      </label>
-                      <input
-                        type="file"
-                        name="profileImage"
-                        accept="image/*"
-                        onChange={handleChange}
-                        className="w-full text-gray-700"
-                      />
-                      {form.profileImage && (
-                        <img
-                          src={
-                            selectedFile
-                              ? form.profileImage
-                              : `${frontendUrl}${form.profileImage}`
-                          }
-                          alt="Preview"
-                          className="w-16 h-16 rounded-full mt-3 border border-gray-200 object-cover"
-                        />
-                      )}
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-400 font-medium">
+                      Last Name
                     </div>
-                    <div className="flex justify-end gap-2 mt-6">
+                    <div className="text-base font-semibold text-gray-700">
+                      {profile.lastName}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-400 font-medium">
+                      Email
+                    </div>
+                    <div className="text-base font-medium text-gray-600">
+                      {profile.email}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-400 font-medium">
+                      Role
+                    </div>
+                    <div className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium mt-1">
+                      {profile.role}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                  <div className="bg-white rounded-2xl shadow-lg w-full max-w-sm p-8 relative">
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-xl font-bold text-gray-800">
+                        Update Profile
+                      </h2>
                       <button
-                        type="button"
                         onClick={() => setShowModal(false)}
-                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition"
+                        className="text-gray-500 hover:text-gray-700 focus:outline-none"
                       >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
-                      >
-                        Save
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-6 w-6"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
                       </button>
                     </div>
-                  </form>
+                    <form onSubmit={handleSubmit}>
+                      <div className="mb-4">
+                        <label className="block text-gray-500 text-sm mb-1 font-medium">
+                          First Name<span className="text-red-500"> *</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="firstName"
+                          value={form.firstName}
+                          onChange={handleChange}
+                          className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                          required
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <label className="block text-gray-500 text-sm mb-1 font-medium">
+                          Last Name<span className="text-red-500"> *</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="lastName"
+                          value={form.lastName}
+                          onChange={handleChange}
+                          className="w-full border border-gray-300 px-3 py-2 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                          required
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <label className="block text-gray-500 text-sm mb-1 font-medium">
+                          Profile Image<span className="text-red-500"> *</span>
+                        </label>
+                        <input
+                          type="file"
+                          name="profileImage"
+                          accept="image/*"
+                          onChange={handleChange}
+                          className="w-full text-gray-700"
+                        />
+                        {form.profileImage && (
+                          <img
+                            src={
+                              selectedFile
+                                ? form.profileImage
+                                : `${frontendUrl}${form.profileImage}`
+                            }
+                            alt="Preview"
+                            className="w-16 h-16 rounded-full mt-3 border border-gray-200 object-cover"
+                          />
+                        )}
+                      </div>
+                      <div className="flex justify-end gap-2 mt-6">
+                        <button
+                          type="button"
+                          onClick={() => setShowModal(false)}
+                          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </form>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </Layout>
+    </div>
   );
 };
 

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "../../components/TokenExpires";
 import Card from "../../components/Card";
-import Layout from "../../components/Layout";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
+import SideBar from "../../components/AdminSideBar";
+import BackButton from "../../components/BackButtons";
 
 const DraftedArticle = () => {
   const [articles, setArticles] = useState([]);
@@ -18,6 +19,8 @@ const DraftedArticle = () => {
 
   const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
   const navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -59,14 +62,26 @@ const DraftedArticle = () => {
 
   const handleArticle = () => navigate("/create-article");
 
+  const contentPadding =
+    user?.role === "admin" ? "pl-6 p-6" : "p-6 sm:pl-36 sm:pr-24";
+
   return (
-    <Layout>
-      <ToastContainer />
-      <div className="p-6 min-h-screen bg-gray-50 rounded-lg">
+    <div className="flex min-h-screen bg-gray-50">
+      {user?.role === "admin" && (
+        <div className="w-64 min-h-screen bg-gray-800 shadow-md">
+          <SideBar />
+        </div>
+      )}
+
+      <div className={`flex-1 min-h-screen ${contentPadding}`}>
+        <ToastContainer />
+
+        <BackButton />
+
         <div className="mb-6 flex flex-col sm:flex-row gap-4 justify-center items-center">
           <input
             type="text"
-            placeholder="Search by title, author name, or email..."
+            placeholder="Search by title or author name"
             className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
             onChange={(e) => {
@@ -83,14 +98,89 @@ const DraftedArticle = () => {
         </div>
 
         {loading ? (
-          <p className="text-center text-lg text-gray-500">Loading Articles...</p>
+          <p className="text-center text-lg text-gray-500">
+            Loading Articles...
+          </p>
         ) : !articles || articles.length === 0 ? (
           <p className="text-center text-lg text-red-500">No articles found.</p>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
               {articles.map((article) => (
-                <Card key={article._id || article.id} article={article} />
+                <Card
+                  key={article._id || article.id}
+                  article={article}
+                  onDelete={async (id) => {
+                    toast.success("✅ Article deleted");
+
+                    let replacement = null;
+                    try {
+                      const needOne = articles.length - 1 < limit;
+                      if (needOne) {
+                        const { data } = await axios.get(
+                          `${frontendUrl}/api/articles/all`,
+                          {
+                            headers: {
+                              Authorization: `Bearer ${localStorage.getItem(
+                                "token"
+                              )}`,
+                            },
+                            params: {
+                              search: debouncedSearchTerm.trim(),
+                              all: "false",
+                              type: "draft",
+                              page: page + 1,
+                              limit: 1,
+                            },
+                          }
+                        );
+                        replacement = data?.articles?.[0] ?? null;
+                      }
+                    } catch (err) {
+                      console.error("Backfill fetch failed:", err);
+                    }
+
+                    setArticles((prev) => {
+                      const updated = prev.filter((a) => a._id !== id);
+                      if (
+                        updated.length < limit &&
+                        replacement &&
+                        !updated.some((a) => a._id === replacement._id)
+                      ) {
+                        return [...updated, replacement];
+                      }
+                      return updated;
+                    });
+
+                    Promise.resolve().then(async () => {
+                      try {
+                        const res = await axios.get(
+                          `${frontendUrl}/api/articles/all`,
+                          {
+                            headers: {
+                              Authorization: `Bearer ${localStorage.getItem(
+                                "token"
+                              )}`,
+                            },
+                            params: {
+                              search: debouncedSearchTerm.trim(),
+                              all: "false",
+                              type: "draft",
+                              page,
+                              limit,
+                            },
+                          }
+                        );
+                        const fresh = res.data?.articles ?? [];
+                        setArticles((curr) =>
+                          curr.length < limit ? fresh : curr
+                        );
+                      } catch (e) {
+                        console.error("Hard refresh failed:", e);
+                      }
+                    });
+                  }}
+                />
               ))}
             </div>
 
@@ -131,7 +221,7 @@ const DraftedArticle = () => {
           </>
         )}
       </div>
-    </Layout>
+    </div>
   );
 };
 

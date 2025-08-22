@@ -95,7 +95,7 @@ const Navbar = ({ user, setUser }) => {
   };
 
   return (
-    <nav className="bg-black p-4 fixed w-full z-10">
+    <nav className="bg-black p-4 fixed w-full z-50">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div
           className="text-white text-2xl md:text-3xl font-semibold cursor-pointer"

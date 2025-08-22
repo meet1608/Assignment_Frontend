@@ -66,7 +66,7 @@ const CreateArticle = () => {
         }
       );
 
-      toast.success(res.data.message || "Article submitted!");
+      toast.success("Article submitted!");
       reset();
       setPreviewImage(null); //
       const user = JSON.parse(localStorage.getItem("user"));
@@ -79,7 +79,8 @@ const CreateArticle = () => {
       setTimeout(() => navigate(redirectPath), 500);
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Error uploading article";
-      toast.error(errorMsg);
+      toast.error("Error uploading article");
+      console.error("Error uploading article:", errorMsg);
     } finally {
       setSubmitting(false);
     }
@@ -97,7 +98,7 @@ const CreateArticle = () => {
             <form className="flex flex-col gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700">
-                  Title
+                  Title<span className="text-red-500"> *</span>
                 </label>
                 <input
                   type="text"
@@ -113,7 +114,7 @@ const CreateArticle = () => {
 
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700">
-                  Content
+                  Content<span className="text-red-500"> *</span>
                 </label>
                 <textarea
                   {...register("content")}
@@ -138,7 +139,7 @@ const CreateArticle = () => {
 
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700">
-                  Article Image
+                  Article Image<span className="text-red-500"> *</span>
                 </label>
                 <input
                   type="file"

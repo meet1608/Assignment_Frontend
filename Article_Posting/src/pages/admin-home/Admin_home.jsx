@@ -74,7 +74,10 @@ const AdminHome = () => {
             placeholder="Search by title or author name"
             className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setPage(1);
+            }}
           />
           <select
             className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -105,7 +108,58 @@ const AdminHome = () => {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {articles.map((article) => (
-                <Card key={article._id || article.id} article={article} />
+                <Card
+                  key={article._id || article.id}
+                  article={article}
+                  onDelete={async (id) => {
+                    toast.success("✅ Article deleted");
+
+                    let replacement = null;
+                    try {
+                      const needOne = articles.length - 1 < limit;
+                      if (needOne) {
+                        const { data } = await fetchArticles(
+                          debouncedSearchTerm.trim(),
+                          filter,
+                          page + 1,
+                          1
+                        );
+                        replacement = data?.articles?.[0] ?? null;
+                      }
+                    } catch (err) {
+                      console.error("Backfill fetch failed:", err);
+                    }
+
+                    setArticles((prev) => {
+                      const updated = prev.filter((a) => a._id !== id);
+                      if (
+                        updated.length < limit &&
+                        replacement &&
+                        !updated.some((a) => a._id === replacement._id)
+                      ) {
+                        return [...updated, replacement];
+                      }
+                      return updated;
+                    });
+
+                    Promise.resolve().then(async () => {
+                      if (typeof fetchArticles !== "function") return;
+                      try {
+                        const { data } = await fetchArticles(
+                          debouncedSearchTerm.trim(),
+                          filter,
+                          page,
+                          limit
+                        );
+                        setArticles((curr) =>
+                          curr.length < limit ? data.articles : curr
+                        );
+                      } catch (e) {
+                        console.error("Hard refresh failed:", e);
+                      }
+                    });
+                  }}
+                />
               ))}
             </div>
 

@@ -28,14 +28,14 @@ const Forgot_password = () => {
       const res = await axios.post(`${frontendUrl}/api/users/forgot-password`, {
         email: data.email,
       });
-      toast.success(res.data.message || "Password reset link sent to your email");
+      toast.success("Password reset link sent to your email");
       setTimeout(() => {
         navigate("/login");
       },1000);
     } catch (err) {
       const message = err.response?.data?.message || "Failed to reset password";
       console.error("Forgot Password Error:", message);
-      toast.error(message);
+      toast.error("Failed to reset password");
     }
   };
 
@@ -50,7 +50,7 @@ style={{ backgroundImage: `url(${im3})` }}
       <form className="max-w-md mx-auto mt-8" onSubmit={handleSubmit(onSubmit)} noValidate>
         <div className="mb-4">
           <label htmlFor="email" className="block text-gray-700 text-sm font-semibold mb-2">
-            Email
+            Email<span className="text-red-500"> *</span>
           </label>
           <input
             id="email"

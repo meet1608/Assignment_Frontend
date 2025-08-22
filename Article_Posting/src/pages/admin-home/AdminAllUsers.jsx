@@ -10,7 +10,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import profile from "../../assets/images/profile.avif";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const schema = yup.object().shape({
   firstName: yup
@@ -84,14 +84,15 @@ const AdminAllUsers = () => {
       const res = await axios.post(`${frontendUrl}/api/users/create`, data, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      toast.success(res.data.message || "User added successfully!");
+      toast.success("User added successfully!");
       fetchAllUsers();
       reset();
       setIsModelOpen(false);
     } catch (error) {
       const errMsg =
         error.response?.data?.message || error.message || "Failed to add user.";
-      toast.error(errMsg);
+      toast.error("Failed to add user.");
+      console.error("Error adding user:", errMsg);
     }
   };
 
@@ -107,6 +108,7 @@ const AdminAllUsers = () => {
     const deleteUser = async () => {
       try {
         await axios.delete(`${frontendUrl}/api/users/delete/${userId}`, {
+          data: { isDeleted: true },
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -127,14 +129,16 @@ const AdminAllUsers = () => {
               onClick={async () => {
                 try {
                   await deleteUser();
-                  setUsers((prevUsers) =>
-                    prevUsers.filter((user) => user.id !== userId)
-                  );
-                  closeToast();
+                  
                   toast.success("User deleted", { autoClose: 2000 });
-                  setTimeout(() => {
-                    window.location.reload();
-                  }, 500);
+                  closeToast();
+
+                  if (users.length === 1 && page > 1) {
+                    setPage((prev) => prev - 1);
+                  } else {
+                    fetchAllUsers(searchTerm, limit);
+                  }
+
                 } catch (error) {
                   console.error("Error deleting user:", error);
                   toast.error("Failed to delete");
@@ -200,7 +204,7 @@ const AdminAllUsers = () => {
         <div className="mb-6 flex flex-col sm:flex-row gap-4 justify-center">
           <input
             type="text"
-            placeholder="Search by title, author name, or email..."
+            placeholder="Search by name or email"
             className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/2"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -272,24 +276,23 @@ const AdminAllUsers = () => {
                       {user.isEmailVerified ? "Yes" : "No"}
                     </td>
                     <td className="border px-4 py-2 flex justify-center gap-2">
-                        <button
-                          className="text-blue-500 hover:bg-blue-700 hover:text-white font-bold py-2 px-4 rounded"
-                          onClick={() =>
-                            navigate(`/admin/edit-user/${user.id}`, {
-                              state: { userData: user },
-                            })
-                          }
-                        >
-                          <FaPen className="h-5 w-5" />
-                        </button>
-                      
-                        <button
-                          className="text-red-500 hover:bg-red-700 hover:text-white font-bold py-2 px-4 rounded"
-                          onClick={() => handleDeleteUser(user.id)}
-                        >
-                          <MdDelete className="h-6 w-6" />
-                        </button>
-                      
+                      <button
+                        className="text-blue-500 hover:bg-blue-700 hover:text-white font-bold py-2 px-4 rounded"
+                        onClick={() =>
+                          navigate(`/admin/edit-user/${user.id}`, {
+                            state: { userData: user },
+                          })
+                        }
+                      >
+                        <FaPen className="h-5 w-5" />
+                      </button>
+
+                      <button
+                        className="text-red-500 hover:bg-red-700 hover:text-white font-bold py-2 px-4 rounded"
+                        onClick={() => handleDeleteUser(user.id)}
+                      >
+                        <MdDelete className="h-6 w-6" />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -341,6 +344,7 @@ const AdminAllUsers = () => {
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
               {/* First Name */}
               <div className="mb-4">
+                <label className="block mb-2">First Name<span className="text-red-500"> *</span></label>
                 <input
                   {...register("firstName")}
                   placeholder="First Name"
@@ -357,6 +361,7 @@ const AdminAllUsers = () => {
 
               {/* Last Name */}
               <div className="mb-4">
+                <label className="block mb-2">Last Name<span className="text-red-500"> *</span></label>
                 <input
                   {...register("lastName")}
                   placeholder="Last Name"
@@ -373,6 +378,7 @@ const AdminAllUsers = () => {
 
               {/* Email */}
               <div className="mb-4">
+                <label className="block mb-2">Email<span className="text-red-500"> *</span></label>
                 <input
                   type="email"
                   {...register("email")}
@@ -387,6 +393,7 @@ const AdminAllUsers = () => {
               </div>
               {/* Role */}
               <div className="mb-4">
+                <label className="block mb-2">Role<span className="text-red-500"> *</span></label>
                 <select
                   {...register("role")}
                   defaultValue="user" // ✅ default selection
@@ -421,7 +428,6 @@ const AdminAllUsers = () => {
               </div>
             </form>
           </div>
-          
         </div>
       )}
     </div>

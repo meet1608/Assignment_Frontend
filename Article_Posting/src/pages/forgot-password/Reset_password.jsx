@@ -46,13 +46,13 @@ const Reset_password = () => {
           confirmPassword: data.confirmPassword,
         }
       );
-      toast.success(res.data.message || "Password reset successfully");
+      toast.success("Password reset successfully");
       setTimeout(() => {
         navigate("/login");
       }, 500);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to reset password");
-      console.error("Reset Password Error:", err);
+      toast.error("Failed to reset password");
+      console.error("Reset Password Error:", err || err.response?.data?.message);
     }
   };
 
@@ -75,7 +75,7 @@ style={{ backgroundImage: `url(${im3})` }}
             htmlFor="password"
             className="block text-gray-700 text-sm font-semibold mb-2"
           >
-            New Password
+            New Password<span className="text-red-500"> *</span>
           </label>
           <div className="relative">
             <input
@@ -108,7 +108,7 @@ style={{ backgroundImage: `url(${im3})` }}
             htmlFor="confirmPassword"
             className="block text-gray-700 text-sm font-semibold mb-2"
           >
-            Confirm Password
+            Confirm Password<span className="text-red-500"> *</span>
           </label>
           <div className="relative">
             <input

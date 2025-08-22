@@ -19,7 +19,7 @@ import "react-toastify/dist/ReactToastify.css";
 import profile from "../assets/images/profile.avif";
 const formatDate = (iso) => new Date(iso).toLocaleDateString();
 
-export default function ImgMediaCard({ article }) {
+export default function ImgMediaCard({ article, onDelete}) {
   const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
   const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
@@ -41,12 +41,16 @@ export default function ImgMediaCard({ article }) {
                   await axios.delete(
                     `${frontendUrl}/api/articles/delete/${articleId}`,
                     {
+                      data: { isDeleted: true },
                       headers: { Authorization: `Bearer ${token}` },
                     }
                   );
                   closeToast();
                   toast.success("✅ Article deleted", { autoClose: 2000 });
-                  window.location.reload();
+
+                  if(onDelete) {
+                    onDelete(articleId);
+                  }
                 } catch (error) {
                   console.error("Error deleting article:", error);
                   toast.error("❌ Failed to delete. Please try again.");

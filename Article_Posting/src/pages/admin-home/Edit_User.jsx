@@ -128,7 +128,7 @@ const Edit_User = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-gray-500 text-sm mb-1 font-medium">
-                First Name
+                First Name<span className="text-red-500"> *</span>
               </label>
               <input
                 type="text"
@@ -142,7 +142,7 @@ const Edit_User = () => {
 
             <div>
               <label className="block text-gray-500 text-sm mb-1 font-medium">
-                Last Name
+                Last Name<span className="text-red-500"> *</span>
               </label>
               <input
                 type="text"
@@ -156,7 +156,7 @@ const Edit_User = () => {
 
             <div>
               <label className="block text-gray-500 text-sm mb-1 font-medium">
-                Email
+                Email<span className="text-red-500"> *</span>
               </label>
               <input
                 type="email"
@@ -170,7 +170,7 @@ const Edit_User = () => {
 
             <div>
               <label className="block text-gray-500 text-sm mb-1 font-medium">
-                Role
+                Role<span className="text-red-500"> *</span>
               </label>
               <select
                 name="role"

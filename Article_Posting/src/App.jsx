@@ -26,6 +26,7 @@ import Articles from "./pages/articles/Articles";
 import Edit_User from "./pages/admin-home/Edit_User";
 import LayoutWithNavbar from './components/navbarComponents/LayoutWithNavbar';
 import LayoutWithoutNavbar from './components/navbarComponents/LayoutWithoutNavbar';
+import PageNotFound from "./pages/pageNotFound/NotFound";
 function App() {
   return (
     <Router>
@@ -38,6 +39,8 @@ function App() {
           <Route path="/forgot-password" element={<Forgot_password />} />
           <Route path="/reset-password" element={<Reset_password />} />
           <Route path="/set-password" element={<Password_set />} />
+          <Route path="*" element={<PageNotFound />} />
+
         </Route>
 
         {/* Routes with navbar */}

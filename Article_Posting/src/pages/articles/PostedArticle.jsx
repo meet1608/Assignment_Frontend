@@ -5,7 +5,7 @@ import Card from "../../components/Card";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa6";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const PostedArticle = () => {
   const [articles, setArticles] = useState([]);
@@ -20,17 +20,14 @@ const PostedArticle = () => {
   const navigate = useNavigate();
   const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
-
-  useEffect(()=>{
+  useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
-    if(user?.role === "admin"){
+    if (user?.role === "admin") {
       navigate("/admin/articles");
-    }
-    else{
+    } else {
       navigate("/");
     }
-
-  },[navigate]);
+  }, [navigate]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -65,7 +62,8 @@ const PostedArticle = () => {
           limit: limitValue,
         },
       });
-      const articlesData = res.data?.articles?.articles || res.data?.articles || [];
+      const articlesData =
+        res.data?.articles?.articles || res.data?.articles || [];
       setArticles(Array.isArray(articlesData) ? articlesData : []);
       setTotalPages(res.data?.pagination?.totalPages || 1);
     } catch (error) {
@@ -93,10 +91,13 @@ const PostedArticle = () => {
       <div className="mb-6 flex flex-col sm:flex-row gap-4 justify-center items-center">
         <input
           type="text"
-          placeholder="Search by title, author name, or email..."
+          placeholder="Search by title or author name"
           className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setPage(1);
+          }}
         />
         <select
           className="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -125,7 +126,57 @@ const PostedArticle = () => {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {articles.map((article, idx) => (
-              <Card key={article._id || article.id || idx} article={article} />
+              <Card
+                key={article._id || article.id || idx}
+                article={article}
+                onDelete={async (id) => {
+                  toast.success("✅ Article deleted");
+
+                  let replacement = null;
+                  try {
+                    const needOne = articles.length - 1 < limit;
+                    if (needOne) {
+                      const { data } = await fetchArticles(
+                        debouncedSearchTerm.trim(),
+                        filter,
+                        page + 1,
+                        1
+                      );
+                      replacement = data?.articles?.[0] ?? null;
+                    }
+                  } catch (err) {
+                    console.error("Backfill fetch failed:", err);
+                  }
+
+                  setArticles((prev) => {
+                    const updated = prev.filter((a) => a._id !== id);
+                    if (
+                      updated.length < limit &&
+                      replacement &&
+                      !updated.some((a) => a._id === replacement._id)
+                    ) {
+                      return [...updated, replacement];
+                    }
+                    return updated;
+                  });
+
+                  Promise.resolve().then(async () => {
+                    try {
+                      const { data } = await fetchArticles(
+                        debouncedSearchTerm.trim(),
+                        filter,
+                        page,
+                        limit
+                      );
+                      setArticles((curr) =>
+                        curr.length < limit ? data.articles : curr
+                      );
+                    } catch (e) {
+                      console.error("Hard refresh failed:", e);
+                    }
+                  });
+                }}
+              />
             ))}
           </div>
 
@@ -136,7 +187,7 @@ const PostedArticle = () => {
                 onClick={() => setPage((prev) => prev - 1)}
                 className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition-colors"
               >
-              <FaArrowLeft />
+                <FaArrowLeft />
               </button>
               <span className="text-gray-700">
                 Page {page} of {totalPages}

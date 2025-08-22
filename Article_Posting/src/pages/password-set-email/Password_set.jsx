@@ -40,12 +40,12 @@ const Password_set = () => {
           password: data.password,
         }
       );
-      toast.success(res.data.message || "Password set successfully");
+      toast.success("Password set successfully");
       setTimeout(() => {
         navigate("/login");
       }, 500);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to set password");
+      toast.error("Failed to set password");
       console.error("Error setting password:", err);
     }
   };
@@ -69,7 +69,7 @@ const Password_set = () => {
               htmlFor="password"
               className="block text-gray-700 text-sm font-semibold mb-2"
             >
-              Password
+              Password<span className="text-red-500"> *</span>
             </label>
             {/* Wrap the password input + button together */}
             <div className="relative">
