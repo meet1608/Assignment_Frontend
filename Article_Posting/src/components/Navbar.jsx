@@ -1,8 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { CiUser } from "react-icons/ci";
+import { ThemeContext } from "./ThemeContext";
+import { BsMoonStarsFill, BsSunFill } from "react-icons/bs";
 
 const Navbar = ({ user, setUser }) => {
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
@@ -136,6 +139,17 @@ const Navbar = ({ user, setUser }) => {
           </button>
         </div>
         <div className="hidden md:flex space-x-6 items-center">
+          <button
+            onClick={toggleTheme}
+            className="text-white focus:outline-none"
+            aria-label="Toggle Theme"
+          >
+            {theme === "light" ? (
+              <BsMoonStarsFill className="w-6 h-6" />
+            ) : (
+              <BsSunFill className="w-6 h-6" />
+            )}
+          </button>
           {isLoggedIn ? (
             <div className="relative " ref={dropdownRef}>
               <button
@@ -157,9 +171,9 @@ const Navbar = ({ user, setUser }) => {
                 </span>
               </button>
               {openDropdown && (
-                <div className="absolute right-0 mt-2 w-40 bg-white rounded shadow-lg z-50 cursor-pointer">
+                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded shadow-lg z-50 cursor-pointer">
                   <div
-                    className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    className="py-1 block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                     onClick={() => {
                       handleProfile();
                       setOpenDropdown(false); // Close dropdown
@@ -169,7 +183,7 @@ const Navbar = ({ user, setUser }) => {
                   </div>
 
                   <div
-                    className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    className="py-1 block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                     onClick={() => {
                       handleDraftArticle();
                       setOpenDropdown(false); // Close dropdown
@@ -179,7 +193,7 @@ const Navbar = ({ user, setUser }) => {
                   </div>
 
                   <div
-                    className="py-1 block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    className="py-1 block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                     onClick={() => {
                       handleLogout();
                       setOpenDropdown(false); // Close dropdown
@@ -200,6 +214,18 @@ const Navbar = ({ user, setUser }) => {
 
       {open && (
         <div className="md:hidden mt-2 flex flex-col space-y-2">
+            <button
+                onClick={toggleTheme}
+                className="text-white focus:outline-none flex items-center gap-2"
+                aria-label="Toggle Theme"
+            >
+                {theme === "light" ? (
+                    <BsMoonStarsFill className="w-6 h-6" />
+                ) : (
+                    <BsSunFill className="w-6 h-6" />
+                )}
+                <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
+            </button>
           {isLoggedIn ? (
             <>
               <div
