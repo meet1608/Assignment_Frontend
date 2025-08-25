@@ -17,6 +17,18 @@ const schema = yup.object().shape({
     .min(6, "Password must be at least 6 characters"),
 });
 
+/**
+ * Renders a password setting form for users to set a new password using a token.
+ * The form validates input and handles submission for password setting.
+ * Displays success or failure notifications based on the API response.
+ * Utilizes client-side form validation and secure password visibility toggling.
+ * 
+ * @example
+ * // Renders the password setting form and handles form submission.
+ * PasswordSet()
+ * 
+ * @returns {JSX.Element} Returns a JSX element rendering the password set form UI.
+ */
 const Password_set = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -32,6 +44,14 @@ const Password_set = () => {
     resolver: yupResolver(schema),
   });
 
+  /**
+  * Sets the user's password and redirects to login if successful
+  * @example
+  * sync(data)
+  * Password set successfully
+  * @param {Object} data - Contains the password information.
+  * @returns {void} No return value.
+  **/
   const onSubmit = async (data) => {
     try {
       const res = await axios.post(

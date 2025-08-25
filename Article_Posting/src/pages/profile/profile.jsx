@@ -13,6 +13,14 @@ import SideBar from "../../components/AdminSideBar";
 import BackButton from "../../components/BackButtons";
 import { useLocation } from "react-router-dom";
 
+/**
+ * Renders the profile management interface for viewing and editing user profiles.
+ * @example
+ * ProfilePage()
+ * Renders the user's profile page allowing for viewing and updating profile details.
+ * @function ProfilePage
+ * @returns {JSX.Element} The profile page interface allowing users to view and update their profile details.
+ */
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -27,6 +35,13 @@ const Profile = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const navigate = useNavigate();
   const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
+  /**
+  * Fetches and sets the user's profile details from the server.
+  * @example
+  * sync()
+  * // Sets the user's profile information or handles errors.
+  * @returns {void} Does not return a value.
+  **/
   const fetchProfileDetails = async () => {
     setLoading(true);
     const user = JSON.parse(localStorage.getItem("user"));
@@ -88,6 +103,15 @@ const Profile = () => {
     setSelectedFile(null);
     setShowModal(true);
   };
+  /**
+  * Handles the change event for form inputs, updating the form state accordingly.
+  * @example
+  * handleChange(event)
+  * // Updates form state with new input values
+  * @param {Object} e - The event object from the input change event.
+  * @param {HTMLInputElement} e.target - The target input element from the event.
+  * @returns {void} Updates the form state with the new value or sets a selected file for the profile image.
+  **/
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "profileImage" && files.length > 0) {
@@ -104,6 +128,14 @@ const Profile = () => {
     }
   };
 
+  /**
+   * Handles the form submission for updating user profile.
+   * @example
+   * sync(event);
+   * // Updates user profile and returns updated user data.
+   * @param {Event} e - The event object associated with the form submission.
+   * @returns {void} Does not return a value.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
