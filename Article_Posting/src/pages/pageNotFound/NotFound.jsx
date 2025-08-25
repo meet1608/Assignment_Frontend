@@ -1,6 +1,13 @@
 import React from "react";
 import { Link,useNavigate } from "react-router-dom";
 
+/**
+ * Displays a 404 error page with navigation options based on user role.
+ * @example
+ * handlePageNotFound()
+ * // Redirects to "/admin/articles" if the user is an admin; otherwise, navigates to "/"
+ * @returns {JSX.Element} The 404 error component rendered, with options to navigate based on user role.
+ */
 const PageNotFound = () => {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem("user"));
