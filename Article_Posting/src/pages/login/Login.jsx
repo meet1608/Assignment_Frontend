@@ -25,6 +25,14 @@ const schema = yup.object().shape({
     .min(6, "Password must be at least 6 characters"),
 });
 
+/**
+ * Renders the login page with form validation and handles user authentication.
+ * @example
+ * // Renders login form with email and password input fields.
+ * // Upon form submission, validates user credentials and redirects based on role.
+ * Login()
+ * @returns {JSX.Element} The rendered login page component.
+ */
 const Login = () => {
   const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
   const navigate = useNavigate();
@@ -38,6 +46,14 @@ const Login = () => {
     resolver: yupResolver(schema),
   });
 
+  /**
+   * Handles user login by posting login data to the server and managing the user session.
+   * @example
+   * sync({ email: "user@example.com", password: "securepassword" })
+   * // Result: Navigates to "/admin/articles" if the admin, else to "/" on successful login.
+   * @param {Object} data - The login credentials of the user. Should include email and password.
+   * @returns {void} Initiates a redirect and sets session data upon successful login; displays an error message on failure.
+   */
   const onSubmit = async (data) => {
     try {
       const response = await axios.post(
