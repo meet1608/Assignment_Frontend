@@ -26,6 +26,13 @@ const schema = yup.object().shape({
     .email("Invalid email format"),
 });
 
+/**
+ * Renders a signup form and handles user registration process.
+ * @example
+ * signupComponent()
+ * // Outputs the signup HTML form and handles form submission.
+ * @returns {JSX.Element} Signup form component with validation and submission handling.
+ */
 const Signup = () => {
   const frontendUrl = import.meta.env.VITE_FRONTEND_URL;
 
@@ -42,6 +49,14 @@ const Signup = () => {
     resolver: yupResolver(schema),
   });
 
+  /**
+  * Sends user signup data to the server and navigates to the login page upon success.
+  * @example
+  * sync({firstName: "John", lastName: "Doe", email: "john.doe@example.com"})
+  * // Navigates to login page
+  * @param {Object} formData - The user signup data containing firstName, lastName, and email.
+  * @returns {void} Triggers a success toast and navigates to login on success, error toast on failure.
+  **/
   const onSubmit = async (formData) => {
     try {
       const trimmedData = {
